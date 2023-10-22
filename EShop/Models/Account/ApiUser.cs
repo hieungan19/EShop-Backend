@@ -1,6 +1,9 @@
-﻿namespace EShop.Models.Account
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace EShop.Models.Account 
 {
-    public class ApiUser
+    public class ApiUser: IdentityUser<int>
     {
+        public string FullName { get; set; }
     }
 }

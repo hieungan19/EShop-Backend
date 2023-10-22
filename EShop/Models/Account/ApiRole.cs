@@ -1,6 +1,8 @@
-﻿namespace EShop.Models.Account
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace EShop.Models.Account
 {
-    public class ApiRole
+    public class ApiRole: IdentityRole<int>
     {
     }
 }
