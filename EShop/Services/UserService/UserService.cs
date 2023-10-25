@@ -1,6 +1,7 @@
 ﻿using EShop.Data;
 using EShop.DTOs.Account;
 using EShop.Services.RoleService;
+using Microsoft.AspNet.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace EShop.Services.UserService
@@ -43,5 +44,47 @@ namespace EShop.Services.UserService
 
             return model;
         }
+
+        public async Task<bool> Update(EditUserViewModel formData)
+        {
+            var user = this._context.Users.Where(u => u.Id == formData.Id).FirstOrDefault();
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            if (formData.Email != "")
+            {
+                user.Email = formData.Email;
+                user.UserName = formData.Email;
+            }
+            if (formData.FullName != "")
+            {
+                user.FullName = formData.FullName;
+            }
+
+
+
+            if (formData.OldPassword != "" && formData.NewPassword != "")
+            {
+                PasswordHasher hash = new PasswordHasher();
+                var verifyOldPassword = hash.VerifyHashedPassword(user.PasswordHash, formData.OldPassword);
+
+                if (verifyOldPassword == PasswordVerificationResult.Failed)
+                {
+                    return false;
+                }
+
+                var newPasswordHash = hash.HashPassword(formData.NewPassword);
+                user.PasswordHash = newPasswordHash;
+            }
+
+            this._context.Entry(user).State = EntityState.Modified;
+            this._context.SaveChanges();
+
+            return true;
+        }
+
     }
 }

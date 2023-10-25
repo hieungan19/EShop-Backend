@@ -4,6 +4,7 @@ using EShop.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EShop.Migrations
 {
     [DbContext(typeof(EShopDBContext))]
-    partial class EShopDBContextModelSnapshot : ModelSnapshot
+    [Migration("20231024135201_AddOptions")]
+    partial class AddOptions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,14 +58,14 @@ namespace EShop.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "63523aad-5df6-4d64-9667-0a1c4f4b9c1e",
+                            ConcurrencyStamp = "17488d70-71e6-4794-8067-76f42e0cfbd1",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "9af68d0a-45da-4d0f-a963-014a867f2d4e",
+                            ConcurrencyStamp = "1efbdc53-1556-4b8f-9ef5-ac25d2fbe7d3",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -138,27 +141,6 @@ namespace EShop.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("EShop.Models.CartModel.Cart", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OptionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<double>("UnitPrice")
-                        .HasColumnType("float");
-
-                    b.HasKey("UserId", "OptionId");
-
-                    b.HasIndex("OptionId");
-
-                    b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("EShop.Models.CategoryModel.Category", b =>
@@ -417,25 +399,6 @@ namespace EShop.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("EShop.Models.CartModel.Cart", b =>
-                {
-                    b.HasOne("EShop.Models.Products.Option", "Option")
-                        .WithMany()
-                        .HasForeignKey("OptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EShop.Models.Account.ApiUser", "User")
-                        .WithMany("CartProductOptions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Option");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("EShop.Models.Products.Image", b =>
                 {
                     b.HasOne("EShop.Models.Products.Product", "Product")
@@ -518,11 +481,6 @@ namespace EShop.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EShop.Models.Account.ApiUser", b =>
-                {
-                    b.Navigation("CartProductOptions");
                 });
 
             modelBuilder.Entity("EShop.Models.CategoryModel.Category", b =>

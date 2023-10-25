@@ -7,5 +7,7 @@ namespace EShop.Services.UserService
         Task<UserViewModel> GetUserById(int id);
         Task<List<UserViewModel>> GetUsers(int roleId );
 
+        Task<bool> Update(EditUserViewModel userViewModel);
+
     }
 }

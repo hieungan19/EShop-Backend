@@ -4,6 +4,7 @@ using EShop.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EShop.Migrations
 {
     [DbContext(typeof(EShopDBContext))]
-    partial class EShopDBContextModelSnapshot : ModelSnapshot
+    [Migration("20231024143333_AddCarts")]
+    partial class AddCarts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,14 +58,14 @@ namespace EShop.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "63523aad-5df6-4d64-9667-0a1c4f4b9c1e",
+                            ConcurrencyStamp = "b84de7b3-7ab7-4093-8c25-26950feeb925",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "9af68d0a-45da-4d0f-a963-014a867f2d4e",
+                            ConcurrencyStamp = "61f3d9e6-b222-4faa-a0c7-54fa223c9346",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -426,7 +429,7 @@ namespace EShop.Migrations
                         .IsRequired();
 
                     b.HasOne("EShop.Models.Account.ApiUser", "User")
-                        .WithMany("CartProductOptions")
+                        .WithMany("CartProducts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -522,7 +525,7 @@ namespace EShop.Migrations
 
             modelBuilder.Entity("EShop.Models.Account.ApiUser", b =>
                 {
-                    b.Navigation("CartProductOptions");
+                    b.Navigation("CartProducts");
                 });
 
             modelBuilder.Entity("EShop.Models.CategoryModel.Category", b =>

@@ -34,6 +34,13 @@ namespace EShop.Controllers
             
         }
 
-       
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(EditUserViewModel formData)
+        {
+            //return updated user
+            return Ok(await this._userService.Update(formData));
+        }
+
+
     }
 }

@@ -1,7 +1,11 @@
 using EShop.Data;
 using EShop.JWT;
 using EShop.Models.Account;
+using EShop.Services.CartServices;
+using EShop.Services.CategoryService;
 using EShop.Services.LoginService;
+using EShop.Services.OptionServices;
+using EShop.Services.ProductService;
 using EShop.Services.RegisterService;
 using EShop.Services.RoleService;
 using EShop.Services.TestService;
@@ -57,8 +61,10 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
-
-
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IOptionService, OptionService>();
+builder.Services.AddScoped<ICartService, CartService>(); 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
