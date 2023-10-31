@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using EShop.Models.Products;
 using EShop.Models.CategoryModel;
+using EShop.Models.CouponModel;
 
 namespace EShop.Configuration.Products; 
 public class ProductConfiguration : IEntityTypeConfiguration<Product>
@@ -12,6 +13,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasOne<Category>(p => p.Category)
                .WithMany(c => c.Products)
                .HasForeignKey(p => p.CategoryId);
+
+        builder.HasOne<Coupon>(p => p.CurrentCoupon)
+               .WithMany(c => c.Products)
+               .HasForeignKey(p => p.CurrentCouponId);
 
         builder.HasData
                (

@@ -6,7 +6,7 @@ namespace EShop.Services.CartServices
     {
         
             Task<LayoutCartViewModel> AddToCart(int userId, int productId, int quantity);
-            Task<LayoutCartViewModel> RemoveFromCart(int userId, int productId);
+            Task<LayoutCartViewModel> RemoveFromCart(int userId, int optionId);
             Task<CartViewModel> GetUserCart(int userId);
         
     }

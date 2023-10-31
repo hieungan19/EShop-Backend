@@ -34,9 +34,9 @@ namespace EShop.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(ProductViewModel formData)
+        public async Task<IActionResult> Update(int id, ProductViewModel formData)
         {
-            return Ok( await _productService.Update(formData));
+            return Ok( await _productService.Update(id, formData));
 
         }
         [HttpDelete("{id}")]

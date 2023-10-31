@@ -5,6 +5,8 @@ using EShop.Models;
 using EShop.Models.Account;
 using EShop.Models.CartModel;
 using EShop.Models.CategoryModel;
+using EShop.Models.CouponModel;
+using EShop.Models.OrderModel;
 using EShop.Models.Products;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,9 @@ namespace EShop.Data
         public DbSet<Option> Options { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Cart> Carts { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set;  }
+        public DbSet<Coupon> Coupons { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -39,6 +44,9 @@ namespace EShop.Data
             modelBuilder.ApplyConfiguration(new OptionConfiguration());
             modelBuilder.ApplyConfiguration(new ImageConfiguration());
             modelBuilder.ApplyConfiguration(new CartConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderItemConfiguration());  
+            modelBuilder.ApplyConfiguration(new CouponConfiguration());
         }
     }
 

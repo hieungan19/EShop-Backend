@@ -1,6 +1,7 @@
 ﻿using EShop.DTOs.Image;
 using EShop.DTOs.OptionDTOs;
 using EShop.Models.CategoryModel;
+using EShop.Models.CouponModel;
 
 namespace EShop.DTOs.ProductDTOs
 {
@@ -14,15 +15,17 @@ namespace EShop.DTOs.ProductDTOs
         public double? MaxPrice { get; set; }
         public double? MinPrice { get; set; }
 
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public int CategoryId { get; set; }
+        public int? Id { get; set; }
+        public string? Name { get; set; }
+        public string? Description { get; set; }
+        public int? CategoryId { get; set; }
+        public int? CurrentCouponId { get; set; }
+        public Coupon? CurrentCoupon { get; set; }
         public Category? Category { get; set; }
-        public List<int> OptionsIds { get; set; }
+        public List<int>? OptionsIds { get; set; }
 
         public List<OptionViewModel>? Options { get; set; }
 
-        public List<ImageViewModel> Images { get; set; }
+        public List<ImageViewModel>? Images { get; set; }
     }
 }

@@ -52,6 +52,7 @@ namespace EShop.Services.ProductService
             model.CategoryId = product.CategoryId;
             model.MinPrice = product.MinPrice;
             model.MaxPrice = product.MaxPrice;
+            model.CurrentCouponId = product.CurrentCouponId; 
             model.Images = product.Images.Select(i => new ImageViewModel()
             {
                 Id = i.Id,
@@ -78,7 +79,7 @@ namespace EShop.Services.ProductService
             {
                 Name = formData.Name,
                 Description = formData.Description,
-                CategoryId = formData.CategoryId,
+                CategoryId = formData.CategoryId??0,
             };
 
             _context.Products.Add(product);
@@ -93,11 +94,12 @@ namespace EShop.Services.ProductService
                     Price = opt.Price,
                     Name = opt.Name,
                     Quantity = opt.Quantity,
+
                 };
                 this._context.Options.Add(option);
-
+                
             }
-
+            product.CurrentCouponId = formData.CurrentCouponId; 
             product.MaxPrice = GetMinMaxPrice(product.Options)["Max"];
             product.MinPrice = GetMinMaxPrice(product.Options)["Min"];
 
@@ -131,65 +133,74 @@ namespace EShop.Services.ProductService
             _context.SaveChanges();
         }
 
-        public async Task<ProductViewModel> Update(ProductViewModel formData)
+        public async Task<ProductViewModel> Update(int id, ProductViewModel formData)
         {
-            var product = this._context.Products.Where(p => p.Id == formData.Id).FirstOrDefault();
+            var product = this._context.Products.Where(p => p.Id == id).FirstOrDefault();
 
             if (product == null)
             {
                 throw new Exception();
             }
-            if (formData.Name != "")
+            if (formData.Name != null)
             {
                 product.Name = formData.Name;
             }
-            if (formData.Description != "")
+            if (formData.Description != null)
             {
                 product.Description = formData.Description;
             }
 
             if (formData.CategoryId != 0 && formData.CategoryId > 0)
             {
-                product.CategoryId = formData.CategoryId;
+                product.CategoryId = formData.CategoryId ?? 0; 
             }
 
-
-            var options = _context.Options.Where(o => o.ProductId == formData.Id).ToList().Select(o=> new OptionViewModel
+            if (formData.Options != null)
             {
-                Id = o.Id,
-                Name = o.Name,
-                Price = o.Price,
-                ProductId = o.ProductId, 
-                Quantity = o.Quantity, 
-            });
-           
 
-            foreach(var opt in formData.Options)
-            {
-                if (opt.Id == null)
+                var options = _context.Options.Where(o => o.ProductId == id).ToList().Select(o => new OptionViewModel
                 {
-                    _optionService.Create(opt);
+                    Id = o.Id,
+                    Name = o.Name,
+                    Price = o.Price,
+                    ProductId = o.ProductId,
+                    Quantity = o.Quantity,
+                });
+
+                foreach (var opt in formData.Options)
+                {
+                    if (opt.Id == null)
+                    {
+                        _optionService.Create(opt);
+                    }
                 }
+
+                foreach (var opt in options)
+                {
+                    //change options
+                    var i = formData.Options.FindIndex(option => option.Id == opt.Id);
+                    Console.WriteLine(i);
+                    if (i >= 0)
+                    {
+                        _optionService.Update(formData.Options[i]);
+                    }
+                    else
+                    {
+                        _optionService.Delete(opt.Id);
+                    }
+
+                }
+
+                product.MaxPrice = GetMinMaxPrice(product.Options)["Max"];
+                product.MinPrice = GetMinMaxPrice(product.Options)["Min"];
             }
-
-            foreach (var opt in options)
+            
+            if (formData.CurrentCouponId != null)
             {
-                //change options
-                var i = formData.Options.FindIndex(option => option.Id == opt.Id);
-                Console.WriteLine(i);
-                if (i >= 0)
-                {
-                    _optionService.Update(formData.Options[i]);
-                }
-                else
-                {
-                    _optionService.Delete(opt.Id); 
-                }
-                
+                product.CurrentCouponId = formData.CurrentCouponId;
             }
+            
 
-            product.MaxPrice = GetMinMaxPrice(product.Options)["Max"];
-            product.MinPrice = GetMinMaxPrice(product.Options)["Min"];
             this._context.Entry(product).State = EntityState.Modified;
             this._context.SaveChanges();
 
@@ -248,7 +259,7 @@ namespace EShop.Services.ProductService
         public ProductListViewModel GetPaginatedProducts(FilterViewModel filters)
         {
             int page = filters.CurrentPage != 0 ? filters.CurrentPage : 1;
-            var query = _context.Products.Include(p => p.Images).AsQueryable();
+            var query = _context.Products.Include(p => p.Images).Include(p=>p.CurrentCoupon).AsQueryable();
             if (filters.PerPage == 0) filters.PerPage = query.Count();
             query = FilterQuery(query, filters);
 
@@ -260,6 +271,8 @@ namespace EShop.Services.ProductService
                     MaxPrice = p.MaxPrice,
                     Description = p.Description,
                     CategoryId = p.CategoryId,
+                    CurrentCouponId = p.CurrentCouponId,
+                    CurrentCoupon = p.CurrentCoupon, 
                     Images = p.Images.Select(i => new ImageViewModel()
                     {
                         Id = i.Id,
@@ -276,7 +289,16 @@ namespace EShop.Services.ProductService
             return model;
         }
 
-      
+        public async Task UpdatCurrentDiscount(int productId, int? newCurrentCoupon)
+        {
+            var product = _context.Products.Where(p => p.Id == productId).FirstOrDefault(); 
+            if (product == null) return;
+            product.CurrentCouponId = newCurrentCoupon; 
+            
+                
+        }
+
+
     }
 }
 

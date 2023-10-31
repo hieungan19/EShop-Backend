@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EShop.Models.Shipment
+namespace EShop.Models.OrderModel
 {
-    public enum ShipmentStatus
+    public enum OrderStatus
     {
 
         [Display(Name = "Pending")]

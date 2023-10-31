@@ -7,8 +7,6 @@ namespace EShop.Models.CouponModel
 
         [Display(Name = "Order")]
         Order,
-        [Display(Name = "Option")] Option
-        ,
         [Display(Name = "Product")]
         Product,
     }

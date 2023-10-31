@@ -70,11 +70,11 @@ namespace EShop.Services.CartServices
             return model;
         }
 
-        public async Task<LayoutCartViewModel> RemoveFromCart(int userId, int productId)
+        public async Task<LayoutCartViewModel> RemoveFromCart(int userId, int optionId)
         {
             var user = this._context.Users.Where(u => u.Id == userId).Include(u => u.CartProductOptions).ThenInclude(c => c.Option).FirstOrDefault();
 
-            var cartProductOption = this._context.Carts.Where(c => c.UserId == userId && c.OptionId == productId).FirstOrDefault();
+            var cartProductOption = this._context.Carts.Where(c => c.UserId == userId && c.OptionId == optionId).FirstOrDefault();
             this._context.Carts.Remove(cartProductOption);
 
             this._context.SaveChanges();

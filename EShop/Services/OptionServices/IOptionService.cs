@@ -7,7 +7,7 @@ namespace EShop.Services.OptionServices
     {
         public OptionViewModel GetOptionById(int id);
 
-        public Option Update(OptionViewModel formData);
+        public Task<Option> Update(OptionViewModel formData);
         public Option Create(OptionViewModel formData);
         public void Delete(int? id);
     }

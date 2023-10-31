@@ -64,9 +64,10 @@ namespace EShop.Services.OptionServices
             return model;
         }
 
-        public Option Update(OptionViewModel formData)
+        public async Task<Option> Update(OptionViewModel formData)
         {
-            var option = _context.Options.FirstOrDefault(o => o.Id == formData.Id);
+            var option = this._context.Options.FirstOrDefault(o => o.Id == formData.Id);
+           
 
             if (option == null)
             {
@@ -74,8 +75,9 @@ namespace EShop.Services.OptionServices
             }
 
             option.Name = formData.Name;
-            option.Price = formData.Price;  
-            _context.SaveChangesAsync();
+            option.Price = formData.Price;
+            option.Quantity = formData.Quantity; 
+            this._context.Update(option);
             return option;
         }
 

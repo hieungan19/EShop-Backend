@@ -55,14 +55,14 @@ namespace EShop.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "63523aad-5df6-4d64-9667-0a1c4f4b9c1e",
+                            ConcurrencyStamp = "192990e9-0055-496c-9db7-a522ffa33372",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "9af68d0a-45da-4d0f-a963-014a867f2d4e",
+                            ConcurrencyStamp = "605ca164-0c14-43fb-8a0e-5aff4cc84c04",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -195,6 +195,113 @@ namespace EShop.Migrations
                         });
                 });
 
+            modelBuilder.Entity("EShop.Models.CouponModel.Coupon", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ApplyCouponType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Desciption")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double?>("DiscountAmount")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("DiscountPercent")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double?>("MaxDiscountAmount")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("MinBillAmount")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Coupons");
+                });
+
+            modelBuilder.Entity("EShop.Models.OrderModel.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CouponId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("DiscountAmount")
+                        .HasColumnType("float");
+
+                    b.Property<string>("MobilePhone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ShippingAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<double>("TotalPrice")
+                        .HasColumnType("float");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CouponId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("EShop.Models.OrderModel.OrderItem", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OptionId")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("DiscountAmount")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<double>("UnitPrice")
+                        .HasColumnType("float");
+
+                    b.HasKey("OrderId", "OptionId");
+
+                    b.HasIndex("OptionId");
+
+                    b.ToTable("OrderItems");
+                });
+
             modelBuilder.Entity("EShop.Models.Products.Image", b =>
                 {
                     b.Property<int>("Id")
@@ -256,6 +363,9 @@ namespace EShop.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CurrentCouponId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -273,6 +383,8 @@ namespace EShop.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("CurrentCouponId");
 
                     b.ToTable("Products");
 
@@ -436,6 +548,42 @@ namespace EShop.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("EShop.Models.OrderModel.Order", b =>
+                {
+                    b.HasOne("EShop.Models.CouponModel.Coupon", "Coupon")
+                        .WithMany("Orders")
+                        .HasForeignKey("CouponId");
+
+                    b.HasOne("EShop.Models.Account.ApiUser", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Coupon");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EShop.Models.OrderModel.OrderItem", b =>
+                {
+                    b.HasOne("EShop.Models.Products.Option", "ProductOption")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EShop.Models.OrderModel.Order", "Order")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("ProductOption");
+                });
+
             modelBuilder.Entity("EShop.Models.Products.Image", b =>
                 {
                     b.HasOne("EShop.Models.Products.Product", "Product")
@@ -466,7 +614,13 @@ namespace EShop.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("EShop.Models.CouponModel.Coupon", "CurrentCoupon")
+                        .WithMany("Products")
+                        .HasForeignKey("CurrentCouponId");
+
                     b.Navigation("Category");
+
+                    b.Navigation("CurrentCoupon");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -523,11 +677,30 @@ namespace EShop.Migrations
             modelBuilder.Entity("EShop.Models.Account.ApiUser", b =>
                 {
                     b.Navigation("CartProductOptions");
+
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("EShop.Models.CategoryModel.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("EShop.Models.CouponModel.Coupon", b =>
+                {
+                    b.Navigation("Orders");
+
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("EShop.Models.OrderModel.Order", b =>
+                {
+                    b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("EShop.Models.Products.Option", b =>
+                {
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("EShop.Models.Products.Product", b =>
