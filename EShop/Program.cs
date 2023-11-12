@@ -9,6 +9,7 @@ using EShop.Services.OptionServices;
 using EShop.Services.OrderServices;
 using EShop.Services.ProductService;
 using EShop.Services.RegisterService;
+using EShop.Services.ReviewServices;
 using EShop.Services.RoleService;
 using EShop.Services.TestService;
 using EShop.Services.UserService;
@@ -69,6 +70,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOptionService, OptionService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>(); 
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 var app = builder.Build();
 

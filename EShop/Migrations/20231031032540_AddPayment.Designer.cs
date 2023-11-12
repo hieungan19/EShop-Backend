@@ -4,6 +4,7 @@ using EShop.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EShop.Migrations
 {
     [DbContext(typeof(EShopDBContext))]
-    partial class EShopDBContextModelSnapshot : ModelSnapshot
+    [Migration("20231031032540_AddPayment")]
+    partial class AddPayment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,14 +58,14 @@ namespace EShop.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "e39c2d86-cdf0-4749-9713-fab584afd1bb",
+                            ConcurrencyStamp = "ebf7df23-de8a-44d7-bbee-81b1b0445513",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "513b2e59-d949-42bf-8c81-7068865a21a8",
+                            ConcurrencyStamp = "e5a9f564-482b-4394-ae29-d8c036df04b1",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -249,19 +252,12 @@ namespace EShop.Migrations
                     b.Property<double>("DiscountAmount")
                         .HasColumnType("float");
 
-                    b.Property<bool>("IsPayed")
-                        .HasColumnType("bit");
-
                     b.Property<string>("MobilePhone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("OrderPaymentInfo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ShippingAddress")
                         .IsRequired()
@@ -307,6 +303,267 @@ namespace EShop.Migrations
                     b.HasIndex("OptionId");
 
                     b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("EShop.Models.PaymentModel.Merchant", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastUpdatedByy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MerchantIpnUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MerchantName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MerchantReturnUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MerchantWebLink")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecretKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Merchants");
+                });
+
+            modelBuilder.Entity("EShop.Models.PaymentModel.Payment", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("ExpireDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MerchantId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal?>("PaidAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PaymentContent")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentCurrency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentDestinationId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PaymentLanguage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentLastMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentRefId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("RequiredAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MerchantId");
+
+                    b.HasIndex("PaymentDestinationId");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("EShop.Models.PaymentModel.PaymentDestination", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DesLogo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DesName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DesParentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DesShortName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PaymentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("SortIndex")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DesParentId");
+
+                    b.HasIndex("PaymentId");
+
+                    b.ToTable("PaymentDestinations");
+                });
+
+            modelBuilder.Entity("EShop.Models.PaymentModel.PaymentNotification", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("NotiAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("NotiContent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("NotiDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NotiMerchantId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("NotiMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NotiNotiStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NotiPaymentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("NotiResDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NotiResHttpCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NotiResMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NotiSignature")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentRefId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NotiMerchantId");
+
+                    b.HasIndex("NotiPaymentId");
+
+                    b.ToTable("PaymentNotifications");
+                });
+
+            modelBuilder.Entity("EShop.Models.PaymentModel.PaymentSignature", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsValid")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PaymentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SignAlgo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("SignDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SignOwn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SignValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentId");
+
+                    b.ToTable("PaymentSignatures");
+                });
+
+            modelBuilder.Entity("EShop.Models.PaymentModel.PaymentTransaction", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PaymentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal?>("TranAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("TranDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TranMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TranPayload")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TranStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PaymentId");
+
+                    b.ToTable("PaymentTransactions");
+                });
+
+            modelBuilder.Entity("EShop.Models.Products.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("EShop.Models.Products.Option", b =>
@@ -355,9 +612,6 @@ namespace EShop.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<double>("MaxPrice")
                         .HasColumnType("float");
 
@@ -395,34 +649,6 @@ namespace EShop.Migrations
                             MinPrice = 0.0,
                             Name = "Product 2"
                         });
-                });
-
-            modelBuilder.Entity("EShop.Models.ReviewModel.Review", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Detail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Star")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("EShop.Models.Test", b =>
@@ -600,6 +826,78 @@ namespace EShop.Migrations
                     b.Navigation("ProductOption");
                 });
 
+            modelBuilder.Entity("EShop.Models.PaymentModel.Payment", b =>
+                {
+                    b.HasOne("EShop.Models.PaymentModel.Merchant", "Merchant")
+                        .WithMany("Payments")
+                        .HasForeignKey("MerchantId");
+
+                    b.HasOne("EShop.Models.PaymentModel.PaymentDestination", "PaymentDestination")
+                        .WithMany()
+                        .HasForeignKey("PaymentDestinationId");
+
+                    b.Navigation("Merchant");
+
+                    b.Navigation("PaymentDestination");
+                });
+
+            modelBuilder.Entity("EShop.Models.PaymentModel.PaymentDestination", b =>
+                {
+                    b.HasOne("EShop.Models.PaymentModel.PaymentDestination", "DesParent")
+                        .WithMany("PaymentDestinations")
+                        .HasForeignKey("DesParentId");
+
+                    b.HasOne("EShop.Models.PaymentModel.Payment", null)
+                        .WithMany("PaymentDestinations")
+                        .HasForeignKey("PaymentId");
+
+                    b.Navigation("DesParent");
+                });
+
+            modelBuilder.Entity("EShop.Models.PaymentModel.PaymentNotification", b =>
+                {
+                    b.HasOne("EShop.Models.PaymentModel.Merchant", "Merchant")
+                        .WithMany("PaymentNotifications")
+                        .HasForeignKey("NotiMerchantId");
+
+                    b.HasOne("EShop.Models.PaymentModel.Payment", "Payment")
+                        .WithMany("PaymentNotifications")
+                        .HasForeignKey("NotiPaymentId");
+
+                    b.Navigation("Merchant");
+
+                    b.Navigation("Payment");
+                });
+
+            modelBuilder.Entity("EShop.Models.PaymentModel.PaymentSignature", b =>
+                {
+                    b.HasOne("EShop.Models.PaymentModel.Payment", "Payment")
+                        .WithMany("PaymentSignatures")
+                        .HasForeignKey("PaymentId");
+
+                    b.Navigation("Payment");
+                });
+
+            modelBuilder.Entity("EShop.Models.PaymentModel.PaymentTransaction", b =>
+                {
+                    b.HasOne("EShop.Models.PaymentModel.Payment", "Payment")
+                        .WithMany("PaymentTransactions")
+                        .HasForeignKey("PaymentId");
+
+                    b.Navigation("Payment");
+                });
+
+            modelBuilder.Entity("EShop.Models.Products.Image", b =>
+                {
+                    b.HasOne("EShop.Models.Products.Product", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("EShop.Models.Products.Option", b =>
                 {
                     b.HasOne("EShop.Models.Products.Product", "Product")
@@ -626,17 +924,6 @@ namespace EShop.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("CurrentCoupon");
-                });
-
-            modelBuilder.Entity("EShop.Models.ReviewModel.Review", b =>
-                {
-                    b.HasOne("EShop.Models.Products.Product", "Product")
-                        .WithMany("Reviews")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -714,6 +1001,29 @@ namespace EShop.Migrations
                     b.Navigation("OrderItems");
                 });
 
+            modelBuilder.Entity("EShop.Models.PaymentModel.Merchant", b =>
+                {
+                    b.Navigation("PaymentNotifications");
+
+                    b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("EShop.Models.PaymentModel.Payment", b =>
+                {
+                    b.Navigation("PaymentDestinations");
+
+                    b.Navigation("PaymentNotifications");
+
+                    b.Navigation("PaymentSignatures");
+
+                    b.Navigation("PaymentTransactions");
+                });
+
+            modelBuilder.Entity("EShop.Models.PaymentModel.PaymentDestination", b =>
+                {
+                    b.Navigation("PaymentDestinations");
+                });
+
             modelBuilder.Entity("EShop.Models.Products.Option", b =>
                 {
                     b.Navigation("OrderItems");
@@ -721,9 +1031,9 @@ namespace EShop.Migrations
 
             modelBuilder.Entity("EShop.Models.Products.Product", b =>
                 {
-                    b.Navigation("Options");
+                    b.Navigation("Images");
 
-                    b.Navigation("Reviews");
+                    b.Navigation("Options");
                 });
 #pragma warning restore 612, 618
         }

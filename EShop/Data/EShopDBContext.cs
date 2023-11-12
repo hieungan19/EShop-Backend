@@ -8,6 +8,7 @@ using EShop.Models.CategoryModel;
 using EShop.Models.CouponModel;
 using EShop.Models.OrderModel;
 using EShop.Models.Products;
+using EShop.Models.ReviewModel;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,11 +22,14 @@ namespace EShop.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }  
         public DbSet<Option> Options { get; set; }
-        public DbSet<Image> Images { get; set; }
+
         public DbSet<Cart> Carts { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set;  }
         public DbSet<Coupon> Coupons { get; set; }
+        
+        public DbSet<Review> Reviews { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -42,11 +46,13 @@ namespace EShop.Data
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new ProductConfiguration());
             modelBuilder.ApplyConfiguration(new OptionConfiguration());
-            modelBuilder.ApplyConfiguration(new ImageConfiguration());
             modelBuilder.ApplyConfiguration(new CartConfiguration());
             modelBuilder.ApplyConfiguration(new OrderConfiguration());
             modelBuilder.ApplyConfiguration(new OrderItemConfiguration());  
             modelBuilder.ApplyConfiguration(new CouponConfiguration());
+            modelBuilder.ApplyConfiguration(new ReviewConfiguration()); 
+           
+
         }
     }
 

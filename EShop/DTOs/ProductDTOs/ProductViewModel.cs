@@ -10,7 +10,7 @@ namespace EShop.DTOs.ProductDTOs
         public ProductViewModel()
         {
             this.OptionsIds = new List<int>();
-            this.Images = new List<ImageViewModel>();
+
         }
         public double? MaxPrice { get; set; }
         public double? MinPrice { get; set; }
@@ -23,9 +23,9 @@ namespace EShop.DTOs.ProductDTOs
         public Coupon? CurrentCoupon { get; set; }
         public Category? Category { get; set; }
         public List<int>? OptionsIds { get; set; }
+        public string? ImageUrl { get; set; }
 
         public List<OptionViewModel>? Options { get; set; }
 
-        public List<ImageViewModel>? Images { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace EShop.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<CategoryViewModel>> GetCategories()
+        public async Task<CategoryListViewModel> GetCategories()
         {
             return _categoryService.GetCategories();
         }

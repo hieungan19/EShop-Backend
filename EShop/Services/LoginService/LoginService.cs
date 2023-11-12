@@ -87,5 +87,20 @@ namespace EShop.Services.LoginService
 
             return (token, "sucess", userView);
         }
+
+        public async Task<bool> SendPasswordResetToken(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return false;
+            }
+            ApiUser? user = await _context.Users
+               .Where(u => u.Email == email)
+               .FirstOrDefaultAsync();
+
+            return true;
+        }
+
+       
     }
 }

@@ -4,6 +4,7 @@ using EShop.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EShop.Migrations
 {
     [DbContext(typeof(EShopDBContext))]
-    partial class EShopDBContextModelSnapshot : ModelSnapshot
+    [Migration("20231107142804_AddReview")]
+    partial class AddReview
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,14 +58,14 @@ namespace EShop.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "e39c2d86-cdf0-4749-9713-fab584afd1bb",
+                            ConcurrencyStamp = "058e8de4-8b1b-4cb9-82a7-816a0bdb53bc",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "513b2e59-d949-42bf-8c81-7068865a21a8",
+                            ConcurrencyStamp = "8e754577-79f0-46ce-a2df-4cae034ef177",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -309,6 +312,28 @@ namespace EShop.Migrations
                     b.ToTable("OrderItems");
                 });
 
+            modelBuilder.Entity("EShop.Models.Products.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Images");
+                });
+
             modelBuilder.Entity("EShop.Models.Products.Option", b =>
                 {
                     b.Property<int>("Id")
@@ -353,9 +378,6 @@ namespace EShop.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("MaxPrice")
@@ -600,6 +622,17 @@ namespace EShop.Migrations
                     b.Navigation("ProductOption");
                 });
 
+            modelBuilder.Entity("EShop.Models.Products.Image", b =>
+                {
+                    b.HasOne("EShop.Models.Products.Product", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("EShop.Models.Products.Option", b =>
                 {
                     b.HasOne("EShop.Models.Products.Product", "Product")
@@ -721,6 +754,8 @@ namespace EShop.Migrations
 
             modelBuilder.Entity("EShop.Models.Products.Product", b =>
                 {
+                    b.Navigation("Images");
+
                     b.Navigation("Options");
 
                     b.Navigation("Reviews");

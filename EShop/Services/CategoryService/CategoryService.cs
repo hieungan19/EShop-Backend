@@ -30,12 +30,13 @@ namespace EShop.Services.CategoryService
 
             return model;
         }
-        public List<CategoryViewModel> GetCategories()
+        public CategoryListViewModel GetCategories()
         {
             var query = _context.Categories.AsQueryable();
 
-
-            return query.Select(c => new CategoryViewModel() { Id = c.Id, Name = c.Name }).ToList();
+            CategoryListViewModel model=new CategoryListViewModel();
+            model.Categories = query.Select(c => new CategoryViewModel() { Id = c.Id, Name = c.Name }).ToList();
+            return model; 
 
             //.Include(c => c.Products);
         }

@@ -8,6 +8,8 @@ namespace EShop.Models.OrderModel
         public int Id { get; set; }
         public DateTime OrderDate { get; set; }
         public double TotalPrice { get; set; } 
+        public string OrderPaymentInfo { get; set; }
+        public bool IsPayed { get; set; } = false;
         public double DiscountAmount { get; set; }  
         public string ShippingAddress { get; set; }
         public string MobilePhone { get; set; }

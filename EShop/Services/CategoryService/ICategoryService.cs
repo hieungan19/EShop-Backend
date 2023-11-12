@@ -6,7 +6,7 @@ namespace EShop.Services.CategoryService
 {
     public interface ICategoryService
     {
-        public List<CategoryViewModel> GetCategories();
+        public CategoryListViewModel GetCategories();
         public CategoryViewModel GetCategoryById(int id);
         public void Update(int id, CategoryViewModel formData);
         public int Create(CategoryViewModel formData);

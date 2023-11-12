@@ -35,7 +35,7 @@ namespace EShop.Services.ProductService
         }
         public ProductViewModel GetProductById(int id)
         {
-            var product = _context.Products.Where(p => p.Id == id).Include(p => p.Images).Include(p => p.Options).Include(p => p.Category)
+            var product = _context.Products.Where(p => p.Id == id).Include(p => p.Options).Include(p => p.Category).Include(p=>p.Reviews)
               .FirstOrDefault();
 
             if (product == null)
@@ -52,14 +52,8 @@ namespace EShop.Services.ProductService
             model.CategoryId = product.CategoryId;
             model.MinPrice = product.MinPrice;
             model.MaxPrice = product.MaxPrice;
-            model.CurrentCouponId = product.CurrentCouponId; 
-            model.Images = product.Images.Select(i => new ImageViewModel()
-            {
-                Id = i.Id,
-                Url = i.Url,
-                ProductId = i.ProductId,
-
-            }).ToList();
+            model.CurrentCouponId = product.CurrentCouponId;
+            model.ImageUrl = product.ImageUrl; 
             model.Options = product.Options.Select(o => new OptionViewModel()
             {
                 Id = o.Id,
@@ -102,19 +96,12 @@ namespace EShop.Services.ProductService
             product.CurrentCouponId = formData.CurrentCouponId; 
             product.MaxPrice = GetMinMaxPrice(product.Options)["Max"];
             product.MinPrice = GetMinMaxPrice(product.Options)["Min"];
+            product.ImageUrl = formData.ImageUrl;
 
             this._context.Entry(product).State = EntityState.Modified;
             this._context.SaveChanges();
 
-            foreach (var img in formData.Images)
-            {
-                var image = new Image
-                {
-                    ProductId = productId,
-                    Url = img.Url,
-                };
-                this._context.Images.Add(image);
-            }
+           
             _context.SaveChanges();
 
             return product;
@@ -153,6 +140,10 @@ namespace EShop.Services.ProductService
             if (formData.CategoryId != 0 && formData.CategoryId > 0)
             {
                 product.CategoryId = formData.CategoryId ?? 0; 
+            }
+            if (formData.ImageUrl != null )
+            {
+                product.ImageUrl = formData.ImageUrl;
             }
 
             if (formData.Options != null)
@@ -259,7 +250,7 @@ namespace EShop.Services.ProductService
         public ProductListViewModel GetPaginatedProducts(FilterViewModel filters)
         {
             int page = filters.CurrentPage != 0 ? filters.CurrentPage : 1;
-            var query = _context.Products.Include(p => p.Images).Include(p=>p.CurrentCoupon).AsQueryable();
+            var query = _context.Products.Include(p=>p.CurrentCoupon).Include(p=>p.Category).AsQueryable();
             if (filters.PerPage == 0) filters.PerPage = query.Count();
             query = FilterQuery(query, filters);
 
@@ -273,13 +264,8 @@ namespace EShop.Services.ProductService
                     CategoryId = p.CategoryId,
                     CurrentCouponId = p.CurrentCouponId,
                     CurrentCoupon = p.CurrentCoupon, 
-                    Images = p.Images.Select(i => new ImageViewModel()
-                    {
-                        Id = i.Id,
-                        Url = i.Url,
-                        ProductId = i.ProductId,
-
-                    }).ToList(),
+                    ImageUrl =p.ImageUrl,
+                    Category = p.Category
                 }).ToList();
 
             var model = new ProductListViewModel();
