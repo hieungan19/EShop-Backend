@@ -49,8 +49,8 @@ namespace EShop.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, CategoryViewModel formData)
         {
-            _categoryService.Update(id, formData);
-            return Ok(_categoryService.GetCategoryById(id)); 
+            var response =await  _categoryService.Update(id, formData);
+            return Ok(response); 
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

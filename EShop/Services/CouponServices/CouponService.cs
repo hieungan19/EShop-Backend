@@ -2,8 +2,7 @@
 using EShop.DTOs.CouponDTOs;
 using EShop.Models.CouponModel;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
+
 
 namespace EShop.Services.CouponServices
 {
@@ -24,12 +23,11 @@ namespace EShop.Services.CouponServices
                 DiscountPercent = formData.DiscountPercent,
                 StartDate = formData.StartDate,
                 EndDate = formData.EndDate,
-                
-            };
-            Enum.TryParse<ApplyCouponType>(formData.ApplyCouponType, out ApplyCouponType type); 
 
-            coupon.ApplyCouponType = type;
-            if (type == ApplyCouponType.Order)
+            };
+
+            coupon.ApplyCouponType = formData.ApplyCouponType;
+            if (coupon.ApplyCouponType == ApplyCouponType.Order)
             {
                 coupon.MaxDiscountAmount = formData.MaxDiscountAmount;
                 coupon.MinBillAmount = formData.MinBillAmount;
@@ -55,13 +53,15 @@ namespace EShop.Services.CouponServices
             _context.SaveChanges();
         }
 
-        public async Task<IQueryable<Coupon>> GetAll()
+        public async Task<CouponListViewModel> GetAll()
         {
 
             var query = _context.Coupons.AsQueryable();
+            CouponListViewModel model = new CouponListViewModel();
+            model.Coupons = query.Select(c => new CouponViewModel() { Id = c.Id, Name = c.Name, Desciption = c.Desciption, ApplyCouponType = c.ApplyCouponType, DiscountAmount = c.DiscountAmount, DiscountPercent = c.DiscountPercent, StartDate = c.StartDate, EndDate = c.EndDate, MaxDiscountAmount=c.MaxDiscountAmount, MinBillAmount=c.MinBillAmount }).ToList();
+            return model;
 
-            return query; 
-            
+
         }
 
         public async Task<Coupon> GetCouponById(int id)
@@ -72,12 +72,12 @@ namespace EShop.Services.CouponServices
             {
                 throw new Exception();
             }
-            return coupon; 
+            return coupon;
         }
 
         public async Task<Coupon> Update(int id, CouponViewModel newCoupon)
         {
-            
+
             var coupon = _context.Coupons.FirstOrDefault(c => c.Id == id);
 
             if (coupon == null)
@@ -94,7 +94,7 @@ namespace EShop.Services.CouponServices
             }
             if (newCoupon.StartDate != null)
             {
-                coupon.StartDate = newCoupon.StartDate; 
+                coupon.StartDate = newCoupon.StartDate;
             }
             if (newCoupon.EndDate != null)
             {
@@ -118,17 +118,15 @@ namespace EShop.Services.CouponServices
             }
             if (newCoupon.ApplyCouponType != null)
             {
-                
-                Enum.TryParse<ApplyCouponType>(newCoupon.ApplyCouponType, out ApplyCouponType cType); 
-                coupon.ApplyCouponType = cType; 
+                coupon.ApplyCouponType = newCoupon.ApplyCouponType;
             }
 
 
-            this._context.Update(coupon); 
+            this._context.Update(coupon);
             return coupon;
-            
+
         }
 
-        
+
     }
 }

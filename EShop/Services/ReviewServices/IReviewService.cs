@@ -5,6 +5,6 @@ namespace EShop.Services.ReviewServices
 {
     public interface IReviewService
     {
-        public Review Create(ReviewViewModel formData);
+        public Task<Review> Create(ReviewViewModel formData);
     }
 }

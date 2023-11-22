@@ -9,7 +9,7 @@ namespace EShop.Services.CouponServices
         public Task<Coupon> Update(int id,CouponViewModel newCoupon);
         public Task Delete(int id);
         public Task<Coupon> GetCouponById(int id); 
-        public Task<IQueryable<Coupon>> GetAll();
+        public Task<CouponListViewModel> GetAll();
 
     }
 }

@@ -44,7 +44,7 @@ namespace EShop.Controllers
             try
             {
                 _productService.Delete(id);
-                return Ok(); 
+                return NoContent(); 
             }
             catch (Exception ex)
             {

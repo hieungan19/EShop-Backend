@@ -1,5 +1,6 @@
 ﻿using EShop.DTOs.Image;
 using EShop.DTOs.OptionDTOs;
+using EShop.DTOs.ReviewDTOs;
 using EShop.Models.CategoryModel;
 using EShop.Models.CouponModel;
 
@@ -24,7 +25,7 @@ namespace EShop.DTOs.ProductDTOs
         public Category? Category { get; set; }
         public List<int>? OptionsIds { get; set; }
         public string? ImageUrl { get; set; }
-
+        public List<ReviewViewModel>? Reviews { get; set; }
         public List<OptionViewModel>? Options { get; set; }
 
     }

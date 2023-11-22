@@ -52,7 +52,7 @@ namespace EShop.Services.CategoryService
             int id = category.Id;
             return id; 
         }
-        public async void Update(int id, CategoryViewModel formData)
+        public async Task<Category> Update(int id, CategoryViewModel formData)
         {
             var category = _context.Categories.FirstOrDefault(c => c.Id == id);
 
@@ -65,6 +65,7 @@ namespace EShop.Services.CategoryService
             Console.WriteLine(category.Name);
 
            await  _context.SaveChangesAsync();
+            return category; 
            
             
         }

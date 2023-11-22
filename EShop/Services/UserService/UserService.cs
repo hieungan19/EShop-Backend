@@ -27,18 +27,20 @@ namespace EShop.Services.UserService
             return model;
         }
 
-        public async Task<List<UserViewModel>> GetUsers(int roleId )
+        public async Task<UserListViewModel> GetUsers(int roleId )
         {
             var users = await this._context.Users.ToListAsync();
-            var model = new List<UserViewModel>();
+            var model = new UserListViewModel();
 
-            model = users.Select(u => new UserViewModel
+            model.Users = users.Select(u => new UserViewModel
             {
                 Id = u.Id,
                 Email = u.Email,
                 FullName = u.FullName,
                 RoleName = this._roleService.GetUserRole(u.Id),
-                IsInRole = this._roleService.IsUserInRole(u.Id, roleId)
+                IsInRole = this._roleService.IsUserInRole(u.Id, roleId), 
+                PhoneNumber = u.PhoneNumber,
+                Address = u.Address
 
             }).ToList();
 

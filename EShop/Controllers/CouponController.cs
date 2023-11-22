@@ -32,10 +32,10 @@ namespace EShop.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Get()
+        public async Task<CouponListViewModel> Get()
         {
         
-            return Ok(_couponService.GetAll());
+            return await _couponService.GetAll();
         }
 
         [HttpGet("{id}")]

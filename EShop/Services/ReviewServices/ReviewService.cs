@@ -14,10 +14,11 @@ namespace EShop.Services.ReviewServices
             this._context = context;
            
         }
-        public Review Create(ReviewViewModel formData)
+        public async Task<Review> Create(ReviewViewModel formData)
         {
             var review = new Review()
             {
+                UserId = formData.UserId,
                 Detail = formData.Detail,
                 Star = formData.Star,
                 ProductId = formData.ProductId
@@ -27,5 +28,7 @@ namespace EShop.Services.ReviewServices
             _context.SaveChanges();
             return review;
         }
+
+      
     }
 }

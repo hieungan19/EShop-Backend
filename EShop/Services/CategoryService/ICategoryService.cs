@@ -8,7 +8,7 @@ namespace EShop.Services.CategoryService
     {
         public CategoryListViewModel GetCategories();
         public CategoryViewModel GetCategoryById(int id);
-        public void Update(int id, CategoryViewModel formData);
+        public Task<Category> Update(int id, CategoryViewModel formData);
         public int Create(CategoryViewModel formData);
         public void Delete(int id);
     }

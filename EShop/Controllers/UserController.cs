@@ -28,7 +28,7 @@ namespace EShop.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<List<UserViewModel>> GetUsers()
+        public async Task<UserListViewModel> GetUsers()
         {
             return  await this._userService.GetUsers(2);
             

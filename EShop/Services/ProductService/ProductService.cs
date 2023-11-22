@@ -6,6 +6,7 @@ using EShop.DTOs.ProductDTOs;
 using EShop.Models.Products;
 using Microsoft.EntityFrameworkCore;
 using EShop.Services.OptionServices;
+using EShop.DTOs.ReviewDTOs;
 
 namespace EShop.Services.ProductService
 {
@@ -54,6 +55,7 @@ namespace EShop.Services.ProductService
             model.MaxPrice = product.MaxPrice;
             model.CurrentCouponId = product.CurrentCouponId;
             model.ImageUrl = product.ImageUrl; 
+
             model.Options = product.Options.Select(o => new OptionViewModel()
             {
                 Id = o.Id,
@@ -63,6 +65,13 @@ namespace EShop.Services.ProductService
                 Quantity  = o.Quantity
 
             }).ToList();
+
+            model.Reviews = product.Reviews.Select(r=> new ReviewViewModel() { 
+                Detail = r.Detail??"",
+                Star = r.Star, 
+                UserId = r.UserId,
+                
+            } ).ToList();
 
             return model;
         }
@@ -96,6 +105,7 @@ namespace EShop.Services.ProductService
             product.CurrentCouponId = formData.CurrentCouponId; 
             product.MaxPrice = GetMinMaxPrice(product.Options)["Max"];
             product.MinPrice = GetMinMaxPrice(product.Options)["Min"];
+            Console.WriteLine(product.MinPrice); 
             product.ImageUrl = formData.ImageUrl;
 
             this._context.Entry(product).State = EntityState.Modified;
@@ -143,6 +153,7 @@ namespace EShop.Services.ProductService
             }
             if (formData.ImageUrl != null )
             {
+                Console.WriteLine(formData.ImageUrl); 
                 product.ImageUrl = formData.ImageUrl;
             }
 
@@ -260,6 +271,7 @@ namespace EShop.Services.ProductService
                     Id = p.Id,
                     Name = p.Name,
                     MaxPrice = p.MaxPrice,
+                    MinPrice = p.MinPrice,
                     Description = p.Description,
                     CategoryId = p.CategoryId,
                     CurrentCouponId = p.CurrentCouponId,
