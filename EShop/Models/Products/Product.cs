@@ -12,7 +12,7 @@ namespace EShop.Models.Products
         public double MinPrice { get; set; }
         public double MaxPrice { get; set; }
         public string Description { get; set; }
-
+        public int QuantitySold { get; set; }
         public int CategoryId { get; set; }
         public int? CurrentCouponId { get; set; }
         public string? ImageUrl { get; set; }

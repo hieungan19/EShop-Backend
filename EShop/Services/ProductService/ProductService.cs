@@ -7,6 +7,7 @@ using EShop.Models.Products;
 using Microsoft.EntityFrameworkCore;
 using EShop.Services.OptionServices;
 using EShop.DTOs.ReviewDTOs;
+using EShop.Models.CouponModel;
 
 namespace EShop.Services.ProductService
 {
@@ -34,10 +35,29 @@ namespace EShop.Services.ProductService
             }
             return result;
         }
+
+        public ProductViewModel GetCurrentMinMaxPrice(ProductViewModel product, Coupon? coupon)
+        {
+            if (coupon != null)
+            {
+                if (coupon.DiscountAmount != null)
+                {
+                    product.CurrentMaxPrice = product.MaxPrice - coupon.DiscountAmount;
+                    product.CurrentMinPrice = product.MinPrice - coupon.DiscountAmount;
+                }
+                else
+                {
+                    product.CurrentMaxPrice = product.MaxPrice * (1 -  coupon.DiscountPercent/ 100);
+                    product.CurrentMinPrice = product.MinPrice * (1 - coupon.DiscountPercent / 100);
+                }
+
+
+            }
+            return product;
+        }
         public ProductViewModel GetProductById(int id)
         {
-            var product = _context.Products.Where(p => p.Id == id).Include(p => p.Options).Include(p => p.Category).Include(p=>p.Reviews)
-              .FirstOrDefault();
+            var product = _context.Products.Where(p => p.Id == id).Include(p => p.Options).Include(p => p.Category).Include(p=>p.Reviews).Include(p=>p.CurrentCoupon).FirstOrDefault();
 
             if (product == null)
             {
@@ -54,8 +74,12 @@ namespace EShop.Services.ProductService
             model.MinPrice = product.MinPrice;
             model.MaxPrice = product.MaxPrice;
             model.CurrentCouponId = product.CurrentCouponId;
-            model.ImageUrl = product.ImageUrl; 
-
+            model.ImageUrl = product.ImageUrl;
+            model.CurrentCoupon = product.CurrentCoupon;
+            model.QuantitySold = product.QuantitySold;
+            model = GetCurrentMinMaxPrice(model,model.CurrentCoupon);
+            // current price
+            model.CurrentCoupon.Products = null; 
             model.Options = product.Options.Select(o => new OptionViewModel()
             {
                 Id = o.Id,
@@ -66,12 +90,23 @@ namespace EShop.Services.ProductService
 
             }).ToList();
 
-            model.Reviews = product.Reviews.Select(r=> new ReviewViewModel() { 
-                Detail = r.Detail??"",
-                Star = r.Star, 
-                UserId = r.UserId,
-                
-            } ).ToList();
+
+
+            model.Reviews = product.Reviews.Select(r => {
+               
+                var user = _context.Users.Where(u => u.Id==r.UserId).FirstOrDefault(); 
+                return
+                new ReviewViewModel()
+                {
+                    Detail = r.Detail ?? "",
+                    Star = r.Star,
+                    UserId = r.UserId,
+                    UserName = user?.FullName,
+                    Avatar = user?.AvatarUrl
+
+                };
+
+            }).ToList();
 
             return model;
         }
@@ -197,12 +232,13 @@ namespace EShop.Services.ProductService
                 product.MinPrice = GetMinMaxPrice(product.Options)["Min"];
             }
             
-            if (formData.CurrentCouponId != null)
+            if (formData.CurrentCouponId != 0)
             {
                 product.CurrentCouponId = formData.CurrentCouponId;
             }
-            
 
+            product.CurrentCoupon = _context.Coupons.Where(c => c.Id == formData.CurrentCouponId).FirstOrDefault(); 
+            Console.WriteLine(product.CurrentCoupon);
             this._context.Entry(product).State = EntityState.Modified;
             this._context.SaveChanges();
 
@@ -261,23 +297,26 @@ namespace EShop.Services.ProductService
         public ProductListViewModel GetPaginatedProducts(FilterViewModel filters)
         {
             int page = filters.CurrentPage != 0 ? filters.CurrentPage : 1;
-            var query = _context.Products.Include(p=>p.CurrentCoupon).Include(p=>p.Category).AsQueryable();
+            var query = _context.Products.Include(p=>p.CurrentCoupon).Include(p=>p.Category).Include(p=>p.Reviews).AsQueryable();
             if (filters.PerPage == 0) filters.PerPage = query.Count();
             query = FilterQuery(query, filters);
 
             var products = query.Skip((page - 1) * filters.PerPage).Take(filters.PerPage)
-                .Select(p => new ProductViewModel
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    MaxPrice = p.MaxPrice,
-                    MinPrice = p.MinPrice,
-                    Description = p.Description,
-                    CategoryId = p.CategoryId,
-                    CurrentCouponId = p.CurrentCouponId,
-                    CurrentCoupon = p.CurrentCoupon, 
-                    ImageUrl =p.ImageUrl,
-                    Category = p.Category
+                .Select(p =>
+                    new ProductViewModel()
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        MaxPrice = p.MaxPrice,
+                        MinPrice = p.MinPrice,
+                        Description = p.Description,
+                        CategoryId = p.CategoryId,
+                        CurrentCouponId = p.CurrentCouponId,
+                        CurrentCoupon = p.CurrentCoupon,
+                        ImageUrl = p.ImageUrl,
+                        Category = p.Category,
+                        QuantitySold = p.QuantitySold,
+                        AverageStar = p.Reviews.Any() ? p.Reviews.Average(r => r.Star):0
                 }).ToList();
 
             var model = new ProductListViewModel();

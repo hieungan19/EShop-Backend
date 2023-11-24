@@ -11,7 +11,7 @@ namespace EShop.Controllers
 {
     [Route("api/payment")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+   // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
     public class PaymentController : ControllerBase
     {
@@ -20,15 +20,15 @@ namespace EShop.Controllers
         {
             this._momoService =momoService ;
         }
-        [HttpPost("{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> CreatePaymentUrl(int id)
         {
-
+            Console.WriteLine(id); 
             var response = await _momoService.CreatePaymentAsync(id);
-            return Ok(response);
+            return Ok(response); 
         }
 
-        [HttpGet]
+        [HttpGet("payment-callback")]
         public IActionResult PaymentCallBack()
         {
             var response = _momoService.PaymentExecuteAsync(HttpContext.Request.Query);

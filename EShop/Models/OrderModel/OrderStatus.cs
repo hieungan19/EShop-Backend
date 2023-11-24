@@ -9,7 +9,7 @@ namespace EShop.Models.OrderModel
         Pending,
         [Display(Name = "Shipped")]
         Shipped,
-        [Display(Name = "Completed")]
+        [Display(Name = "Finished")]
         Finished,
         [Display(Name = "Cancelled")]
         Cancelled

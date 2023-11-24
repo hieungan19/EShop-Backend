@@ -4,6 +4,7 @@ using EShop.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EShop.Migrations
 {
     [DbContext(typeof(EShopDBContext))]
-    partial class EShopDBContextModelSnapshot : ModelSnapshot
+    [Migration("20231122161802_UpdateUserAvatarUrl")]
+    partial class UpdateUserAvatarUrl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,14 +58,14 @@ namespace EShop.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "c23e1128-92e6-4211-af10-acdd25f7e2dc",
+                            ConcurrencyStamp = "95e32c80-21c7-4a98-8cf1-fded84f91dc7",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "b1aaa7f1-d046-47bd-9b3d-7ad26c694e05",
+                            ConcurrencyStamp = "d3f542c0-fc3f-4be2-9acc-fca1646aa480",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -265,8 +268,9 @@ namespace EShop.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("int");
+                    b.Property<string>("OrderPaymentInfo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ShippingAddress")
                         .IsRequired()
@@ -335,9 +339,6 @@ namespace EShop.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuantitySold")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
@@ -376,9 +377,6 @@ namespace EShop.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("QuantitySold")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
@@ -395,8 +393,7 @@ namespace EShop.Migrations
                             Description = "Test Product",
                             MaxPrice = 0.0,
                             MinPrice = 0.0,
-                            Name = "Product 1",
-                            QuantitySold = 0
+                            Name = "Product 1"
                         },
                         new
                         {
@@ -405,8 +402,7 @@ namespace EShop.Migrations
                             Description = "Test Product",
                             MaxPrice = 0.0,
                             MinPrice = 0.0,
-                            Name = "Product 2",
-                            QuantitySold = 0
+                            Name = "Product 2"
                         });
                 });
 

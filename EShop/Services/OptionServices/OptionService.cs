@@ -16,7 +16,7 @@ namespace EShop.Services.OptionServices
         {
             var option = new Option()
             {
-                ProductId = formData.ProductId,
+                ProductId = formData.ProductId??0,
                 Name = formData.Name,
                 Price = formData.Price,
                 Quantity = formData.Quantity, 

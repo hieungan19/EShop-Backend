@@ -34,8 +34,10 @@ namespace EShop.Services.OrderServices
                 MobilePhone = o.MobilePhone,
                 ShippingAddress = o.ShippingAddress,
                 TotalPrice = o.TotalPrice,
-                Status = o.Status.GetType().GetMember(o.Status.ToString()).FirstOrDefault().GetCustomAttribute<DisplayAttribute>().Name,
-                OrderDate = o.OrderDate.ToString("dd/MM/yyyy HH:mm"),
+                Status = o.Status,
+                PaymentMethod = o.PaymentMethod, 
+                
+                OrderDate = o.OrderDate,
             }).ToListAsync();
         }
 
@@ -45,47 +47,54 @@ namespace EShop.Services.OrderServices
             //var cart = this._context.Carts.Where(c => c.UserId == formData.UserId).Include(c => c.OptionId).ToList();
             var orderItems = new List<OrderItem>();
             var itemsList = formData.ItemsList;
-            var productList = _context.Products; 
+            var productList = _context.Products;
             double total = 0;
             double orderDiscountAmount = 0;
+            
             foreach (var item in itemsList)
             {
-                var product = productList.Where(p => p.Id == item.ProductId).Include(p => p.CurrentCoupon).FirstOrDefault();
-                var coupon = product.CurrentCoupon; 
-                double discountAmount = 0;
+                Option option = _context.Options.Where(o => o.Id == item.Id).Include(o=>o.Product).ThenInclude(p=>p.CurrentCoupon).FirstOrDefault();
+                double price = option.Price;
+                Product product = option.Product;
                 
-                if (DateTime.Now < coupon.EndDate && coupon.DiscountAmount != null)
-                    discountAmount = coupon?.DiscountAmount ?? 0;
-                else if (coupon.DiscountPercent!=null) discountAmount =  (coupon?.DiscountPercent??0) * item.Price/100;
+                var coupon = product.CurrentCoupon;
 
-                Console.Write(discountAmount); 
+                double discountAmount = 0;
+                if (coupon != null)
+                {
+                    if (DateTime.Now < coupon.EndDate && coupon.DiscountAmount != null)
+                        discountAmount = coupon?.DiscountAmount ?? 0;
+                    else if (coupon.DiscountPercent != null) discountAmount = (coupon?.DiscountPercent ?? 0) * price / 100;
+                }
+
+                Console.Write(discountAmount);
 
                 orderItems.Add(new OrderItem()
                 {
                     OptionId = item.Id ?? 0,
                     Quantity = item.Quantity,
-                    UnitPrice = item.Price,
+                    UnitPrice = price,
                     DiscountAmount = discountAmount
                 });
-                total += item.Quantity * item.Price -  discountAmount * item.Quantity; 
+                total += item.Quantity * price - discountAmount * item.Quantity;
             }
             if (formData.CouponId != null)
             {
 
                 Coupon coupon = _context.Coupons.Where(c => c.Id == formData.CouponId).FirstOrDefault();
-                Console.WriteLine(coupon.Name); 
-                if (total>=coupon?.MinBillAmount )
+                Console.WriteLine(coupon.Name);
+                if (total >= coupon?.MinBillAmount)
                 {
                     if (coupon?.DiscountAmount != null) orderDiscountAmount = coupon?.DiscountAmount ?? 0;
-                    if (coupon?.DiscountPercent != null) orderDiscountAmount = total * (coupon?.DiscountPercent?? 0)/100;
-                    if (coupon.MaxDiscountAmount != null && orderDiscountAmount > coupon.MaxDiscountAmount )
+                    if (coupon?.DiscountPercent != null) orderDiscountAmount = total * (coupon?.DiscountPercent ?? 0) / 100;
+                    if (coupon.MaxDiscountAmount != null && orderDiscountAmount > coupon.MaxDiscountAmount)
                     {
-                        orderDiscountAmount = coupon.MaxDiscountAmount??0; 
+                        orderDiscountAmount = coupon.MaxDiscountAmount ?? 0;
                     }
-                    
+
 
                 }
-             
+
 
             }
 
@@ -98,9 +107,12 @@ namespace EShop.Services.OrderServices
                 MobilePhone = formData.MobilePhone,
                 UserId = formData.UserId,
                 OrderDate = DateTime.Now,
-                DiscountAmount = orderDiscountAmount
-              
+                DiscountAmount = orderDiscountAmount,
+                PaymentMethod = formData.PaymentMethod,
+
+
             };
+
 
             this._context.Orders.Add(order);
 
@@ -115,24 +127,27 @@ namespace EShop.Services.OrderServices
 
         public OrderViewModel GetOrderById(int id)
         {
-            var order = this._context.Orders.Where(o => o.Id == id).FirstOrDefault();
+            var order = this._context.Orders.Where(o => o.Id == id).Include(o=>o.User).FirstOrDefault();
             var orderItemList = this._context.OrderItems.Where(oi => oi.OrderId == id).ToList();
-            foreach(var i in orderItemList)
+            foreach (var i in orderItemList)
             {
-                i.Order = null; 
+                i.Order = null;
             }
             var model = new OrderViewModel()
             {
                 Id = order.Id,
                 UserId = order.UserId,
                 MobilePhone = order.MobilePhone,
-                OrderDate = order.OrderDate.ToString(),
+                OrderDate = order.OrderDate,
                 ShippingAddress = order.ShippingAddress,
-                Status = order.Status.GetType().GetMember(order.Status.ToString()).FirstOrDefault().GetCustomAttribute<DisplayAttribute>().Name,
+                Status = order.Status,
                 TotalPrice = order.TotalPrice,
                 DiscountAmount = order.DiscountAmount,
-                OrderItems  = orderItemList
-                
+                OrderItems = orderItemList,
+                IsPayed = order.IsPayed,
+                UserInfo = new DTOs.Account.UserViewModel() { Id = order.UserId, FullName=order.User.FullName,AvatarUrl = order.User.AvatarUrl, Email = order.User.Email }
+
+
             };
 
             return model;
@@ -146,21 +161,27 @@ namespace EShop.Services.OrderServices
             if (order.Status != status)
             {
                 order.Status = status;
-                this._context.Update(order); 
+                this._context.Update(order);
 
                 if (order.Status == OrderStatus.Shipped)
                 {
                     foreach (var item in items)
                     {
-                      
+
                         var opt = options!.Where(o => o.Id == item.OptionId).FirstOrDefault();
-
+                        var product = _context.Products.Where(p => p.Id == opt.ProductId).FirstOrDefault();
+                        product.QuantitySold = product.QuantitySold + item.Quantity;
                         int quantity = opt.Quantity - item.Quantity;
-                        Console.WriteLine(quantity); 
-
                         this._optionService.Update(new OptionViewModel() { Id = item.OptionId, Name = opt.Name, ProductId = opt.ProductId, Quantity = quantity });
 
                     }
+                }
+
+                if (order.Status == OrderStatus.Finished)
+                {
+
+                    order.IsPayed = true;
+                    this._context.Update(order);
                 }
             }
 

@@ -9,6 +9,7 @@ namespace EShop.Models.Products
         public double Price { get; set; }
         public int Quantity { get; set; }
         public int ProductId { get; set; }
+        public int QuantitySold { get; set;  }
         public virtual Product Product { get; set; }
         public virtual ICollection<OrderItem> OrderItems { get; set; }
 

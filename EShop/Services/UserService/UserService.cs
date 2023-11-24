@@ -24,6 +24,9 @@ namespace EShop.Services.UserService
             model.Email = user.Email;
             model.FullName = user.FullName;
             model.RoleName = this._roleService.GetUserRole(id);
+            model.PhoneNumber = user.PhoneNumber;
+            model.Address = user.Address;
+            model.AvatarUrl = user.AvatarUrl; 
             return model;
         }
 
@@ -40,7 +43,8 @@ namespace EShop.Services.UserService
                 RoleName = this._roleService.GetUserRole(u.Id),
                 IsInRole = this._roleService.IsUserInRole(u.Id, roleId), 
                 PhoneNumber = u.PhoneNumber,
-                Address = u.Address
+                Address = u.Address,
+                AvatarUrl = u.AvatarUrl,
 
             }).ToList();
 
@@ -56,17 +60,23 @@ namespace EShop.Services.UserService
                 return false;
             }
 
-            if (formData.Email != "")
+            if (formData.Email != null)
             {
                 user.Email = formData.Email;
-                user.UserName = formData.Email;
             }
-            if (formData.FullName != "")
+            if (formData.FullName != null)
             {
                 user.FullName = formData.FullName;
             }
 
-
+            if (formData.Address != null)
+            {
+                user.Address = formData.Address;
+            }
+            if (formData.AvatarUrl != null)
+            {
+                user.AvatarUrl = formData.AvatarUrl;
+            }
 
             if (formData.OldPassword != "" && formData.NewPassword != "")
             {

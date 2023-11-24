@@ -66,7 +66,7 @@ namespace EShop.Services.CouponServices
 
         public async Task<Coupon> GetCouponById(int id)
         {
-            var coupon = _context.Coupons.Include(c => c.Products).FirstOrDefault(c => c.Id == id);
+            var coupon = _context.Coupons.FirstOrDefault(c => c.Id == id);
 
             if (coupon == null)
             {

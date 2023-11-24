@@ -1,10 +1,12 @@
 using EShop.Data;
 using EShop.JWT;
 using EShop.Models.Account;
+using EShop.Models.PaymentModel;
 using EShop.Services.CartServices;
 using EShop.Services.CategoryService;
 using EShop.Services.CouponServices;
 using EShop.Services.LoginService;
+using EShop.Services.MomoServices;
 using EShop.Services.OptionServices;
 using EShop.Services.OrderServices;
 using EShop.Services.ProductService;
@@ -71,6 +73,8 @@ builder.Services.AddScoped<IOptionService, OptionService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>(); 
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
+builder.Services.AddScoped<IMomoService, MomoService>();
 
 var app = builder.Build();
 

@@ -28,7 +28,7 @@ namespace EShop.Services.CartServices
             {
                 var productOption = this._context.Options.Where(o => o.Id == optionId).FirstOrDefault();
 
-                var cartProductToAdd = new Cart { UserId = user.Id, OptionId = productOption.Id, Quantity = quantity, UnitPrice =productOption.Price };
+                var cartProductToAdd = new Cart { UserId = user.Id, OptionId = productOption.Id, Quantity = quantity, UnitPrice = productOption.Price };
 
                 user.CartProductOptions.Add(cartProductToAdd);
             }
@@ -44,22 +44,36 @@ namespace EShop.Services.CartServices
 
         public async Task<CartViewModel> GetUserCart(int userId)
         {
-            var user = this._context.Users.Where(u => u.Id == userId).Include(u => u.CartProductOptions).ThenInclude(c => c.Option).ThenInclude(o => o.Product).FirstOrDefault();
-            var cartProductOptions= user.CartProductOptions.ToList();
+            var user = this._context.Users.Where(u => u.Id == userId).Include(u => u.CartProductOptions).ThenInclude(c => c.Option).ThenInclude(o => o.Product).ThenInclude(p=>p.CurrentCoupon).FirstOrDefault();
+            var cartProductOptions = user.CartProductOptions.ToList();
             var products = user.CartProductOptions.Select(c => c.Option).ToList();
 
-            var optionsList = products.Select(o => {
+            var optionsList = products.Select(o =>
+            {
                 o.Product.Category = null;
-                o.Product.Options = null; 
+                o.Product.Options = null;
+                OptionViewModel opt = new OptionViewModel();
+                opt.Id = o.Id;
+                opt.Name = o.Name;
+                opt.Price = o.Price;
+                opt.Quantity = cartProductOptions.Where(cpo => cpo.OptionId == o.Id).FirstOrDefault().Quantity;
+                opt.ProductId = o.ProductId; 
+                opt.ProductName = o.Product.Name;
+                opt.ProductImageUrl = o.Product.ImageUrl; 
 
-                return new OptionViewModel
+                if (o.Product.CurrentCoupon != null)
                 {
-                    Id = o.Id,
-                    Name = o.Name,
-                    Price = o.Price,
-                    Quantity = cartProductOptions.Where(cpo => cpo.OptionId == o.Id).FirstOrDefault().Quantity,
-                    Product = o.Product
-                };
+                    if (o.Product.CurrentCoupon.DiscountAmount != null)
+                    {
+                        opt.CurrentPrice = opt.Price - o.Product.CurrentCoupon.DiscountAmount;
+                    }
+                    else
+                    {
+                        opt.CurrentPrice = opt.Price * (1 - o.Product.CurrentCoupon.DiscountPercent / 100);
+                    }
+                }
+
+                return opt;
             }).ToList();
 
             var model = new CartViewModel();
@@ -81,7 +95,7 @@ namespace EShop.Services.CartServices
 
             var model = new LayoutCartViewModel();
 
-            model.OptionIds = user.CartProductOptions.Select(o=>o.OptionId).ToList();
+            model.OptionIds = user.CartProductOptions.Select(o => o.OptionId).ToList();
             model.Quantity = user.CartProductOptions.Select(p => p.Quantity).Sum();
             return model;
         }
