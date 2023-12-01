@@ -8,6 +8,7 @@ namespace EShop.DTOs.OrderDTOs
     public class OrderViewModel
     {
         public int? Id { get; set; }
+        public string ReceiverName { get; set; }
         public double? TotalPrice { get; set; }
         public DateTime? OrderDate { get; set; }
         public string ShippingAddress { get; set; }
@@ -21,6 +22,6 @@ namespace EShop.DTOs.OrderDTOs
         public OrderPaymentMethod PaymentMethod { get; set; }
         public Coupon? coupon { get; set; }
         public List<OptionViewModel> ItemsList { get; set; }
-        public List<OrderItem>? OrderItems { get; set; } = new List<OrderItem>();
+        public List<OrderItemViewModel>? OrderItems { get; set; } = new List<OrderItemViewModel>();
     }
 }

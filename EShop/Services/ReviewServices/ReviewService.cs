@@ -21,7 +21,8 @@ namespace EShop.Services.ReviewServices
                 UserId = formData.UserId,
                 Detail = formData.Detail,
                 Star = formData.Star,
-                ProductId = formData.ProductId
+                ProductId = formData.ProductId, 
+                CreatedDate = DateTime.Now,
             }; 
 
             _context.Reviews.Add(review);

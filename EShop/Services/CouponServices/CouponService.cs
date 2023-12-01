@@ -6,12 +6,52 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EShop.Services.CouponServices
 {
+
     public class CouponService : ICouponService
     {
         private readonly EShopDBContext _context;
         public CouponService(EShopDBContext context)
         {
             this._context = context;
+        }
+
+
+        public async Task<CouponListViewModel> GetBillCouponAvailable(double total)
+        {
+            DateTime dateTimeNow = DateTime.Now; 
+            var coupons = _context.Coupons.Where(c=> c.ApplyCouponType == ApplyCouponType.Order &&(c.MinBillAmount <= total || c.MinBillAmount==null) && ( dateTimeNow>c.StartDate && dateTimeNow<c.EndDate) ).ToList();
+            CouponListViewModel model = new CouponListViewModel();
+            model.Coupons = coupons.Select(c=> new CouponViewModel()
+            {
+                Id = c.Id, Name = c.Name, Desciption = c.Desciption, ApplyCouponType = c.ApplyCouponType, DiscountAmount = c.DiscountAmount, DiscountPercent = c.DiscountPercent, StartDate = c.StartDate, EndDate = c.EndDate, MaxDiscountAmount=c.MaxDiscountAmount, MinBillAmount=c.MinBillAmount
+
+            }).ToList();
+
+            return model; 
+
+        }
+
+        public async Task<CouponListViewModel> GetProductCouponAvailable()
+        {
+            DateTime dateTimeNow = DateTime.Now;
+            var coupons = _context.Coupons.Where(c => c.ApplyCouponType == ApplyCouponType.Product &&  (dateTimeNow > c.StartDate && dateTimeNow < c.EndDate)).ToList();
+            CouponListViewModel model = new CouponListViewModel();
+            model.Coupons = coupons.Select(c => new CouponViewModel()
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Desciption = c.Desciption,
+                ApplyCouponType = c.ApplyCouponType,
+                DiscountAmount = c.DiscountAmount,
+                DiscountPercent = c.DiscountPercent,
+                StartDate = c.StartDate,
+                EndDate = c.EndDate,
+                
+
+            }).ToList();
+
+            return model;
+
         }
         public async Task<Coupon> Create(CouponViewModel formData)
         {
@@ -23,6 +63,7 @@ namespace EShop.Services.CouponServices
                 DiscountPercent = formData.DiscountPercent,
                 StartDate = formData.StartDate,
                 EndDate = formData.EndDate,
+
 
             };
 
@@ -63,6 +104,7 @@ namespace EShop.Services.CouponServices
 
 
         }
+
 
         public async Task<Coupon> GetCouponById(int id)
         {

@@ -38,6 +38,7 @@ namespace EShop.Services.ProductService
 
         public ProductViewModel GetCurrentMinMaxPrice(ProductViewModel product, Coupon? coupon)
         {
+
             if (coupon != null)
             {
                 if (coupon.DiscountAmount != null)
@@ -53,6 +54,11 @@ namespace EShop.Services.ProductService
 
 
             }
+            else
+            {
+                product.CurrentMaxPrice = product.MaxPrice;
+                product.CurrentMinPrice = product.MinPrice; 
+            }
             return product;
         }
         public ProductViewModel GetProductById(int id)
@@ -67,6 +73,8 @@ namespace EShop.Services.ProductService
             var model = new ProductViewModel();
             product.Category.Products = null;
             model.Id = id;
+            model.AverageStar = product.Reviews.Any() ? product.Reviews.Average(r => r.Star) : 0; 
+
             model.Name = product.Name;
             model.Description = product.Description;
             model.Category = product.Category;
@@ -79,6 +87,7 @@ namespace EShop.Services.ProductService
             model.QuantitySold = product.QuantitySold;
             model = GetCurrentMinMaxPrice(model,model.CurrentCoupon);
             // current price
+            if (model.CurrentCoupon!=null)
             model.CurrentCoupon.Products = null; 
             model.Options = product.Options.Select(o => new OptionViewModel()
             {
@@ -102,7 +111,8 @@ namespace EShop.Services.ProductService
                     Star = r.Star,
                     UserId = r.UserId,
                     UserName = user?.FullName,
-                    Avatar = user?.AvatarUrl
+                    Avatar = user?.AvatarUrl,
+                    CreatedDate = r.CreatedDate, 
 
                 };
 

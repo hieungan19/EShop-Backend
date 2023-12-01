@@ -49,5 +49,19 @@ namespace EShop.Controllers
         {
             _couponService.Update(id, newCoupon);
         }
+
+        [HttpGet("bill/{total}")]
+        public async Task<CouponListViewModel> GetAllBillCouponAvailable (double total)
+        {
+            return await _couponService.GetBillCouponAvailable(total);
+            
+        }
+
+        [HttpGet("product")]
+        public async Task<CouponListViewModel> GetAllProductCouponAvailable()
+        {
+            return await _couponService.GetProductCouponAvailable();
+
+        }
     }
 }

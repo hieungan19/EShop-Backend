@@ -6,6 +6,7 @@ namespace EShop.Models.OrderModel
     public class Order
     {
         public int Id { get; set; }
+        public string ReceiverName { get; set; }
         public DateTime OrderDate { get; set; }
         public double TotalPrice { get; set; } 
         public OrderPaymentMethod PaymentMethod { get; set; }

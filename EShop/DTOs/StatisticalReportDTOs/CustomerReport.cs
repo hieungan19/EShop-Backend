@@ -2,8 +2,11 @@
 {
     public class CustomerReport
     {
-        // Số lượng khách hàng (chưa mua, đã mua) 
-        // Phân chia các cấp độ theo số tiền khách đã mua 
-        // Biểu đồ tròn 
+        public int Level0 { get; set;  }
+        public int Level1k { get; set; }
+        public int Level5k { get; set; }
+        public int Level10k { get; set; }
+        public int LevelOver10k { get; set; }
+        public int Total { get; set; }
     }
 }

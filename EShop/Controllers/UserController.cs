@@ -35,10 +35,10 @@ namespace EShop.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(EditUserViewModel formData)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] EditUserViewModel formData)
         {
             //return updated user
-            return Ok(await this._userService.Update(formData));
+            return Ok(await this._userService.Update(id, formData));
         }
 
 

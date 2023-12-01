@@ -10,6 +10,9 @@ namespace EShop.Services.CouponServices
         public Task Delete(int id);
         public Task<Coupon> GetCouponById(int id); 
         public Task<CouponListViewModel> GetAll();
+        public Task<CouponListViewModel> GetBillCouponAvailable(double total);
+        public Task<CouponListViewModel> GetProductCouponAvailable();
+
 
     }
 }

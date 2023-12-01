@@ -27,20 +27,43 @@ namespace EShop.Services.OrderServices
 
         public async Task<List<OrderViewModel>> GetAllOrders()
         {
-            return await this._context.Orders.Select(o => new OrderViewModel()
+            return await this._context.Orders.Include(o=>o.User).OrderByDescending(o => o.OrderDate).Select(o => new OrderViewModel()
+            {
+                Id = o.Id,
+                UserId = o.UserId,
+                MobilePhone = o.MobilePhone,
+                ShippingAddress = o.ShippingAddress,
+                DiscountAmount = o.DiscountAmount, 
+                TotalPrice = o.TotalPrice,
+                IsPayed = o.IsPayed,
+                Status = o.Status,
+                PaymentMethod = o.PaymentMethod, 
+                ReceiverName = o.ReceiverName, 
+                OrderDate = o.OrderDate,
+                
+            }).ToListAsync();
+        }
+
+        public async Task<List<OrderViewModel>> GetAllOrdersByUserId(int userId)
+            
+        {
+            Console.WriteLine(userId);
+            return await this._context.Orders.Where(o=>o.UserId==userId).Include(o => o.User).OrderByDescending(o => o.OrderDate).Select(o => new OrderViewModel()
             {
                 Id = o.Id,
                 UserId = o.UserId,
                 MobilePhone = o.MobilePhone,
                 ShippingAddress = o.ShippingAddress,
                 TotalPrice = o.TotalPrice,
+                DiscountAmount = o.DiscountAmount, 
+                IsPayed = o.IsPayed,
                 Status = o.Status,
-                PaymentMethod = o.PaymentMethod, 
-                
+                PaymentMethod = o.PaymentMethod,
+                ReceiverName = o.ReceiverName,
                 OrderDate = o.OrderDate,
+
             }).ToListAsync();
         }
-
         public async Task<Order> Create(OrderViewModel formData)
         {
 
@@ -83,11 +106,11 @@ namespace EShop.Services.OrderServices
 
                 Coupon coupon = _context.Coupons.Where(c => c.Id == formData.CouponId).FirstOrDefault();
                 Console.WriteLine(coupon.Name);
-                if (total >= coupon?.MinBillAmount)
+                if (total >= coupon?.MinBillAmount || coupon?.MinBillAmount == null || coupon?.MinBillAmount == 0)
                 {
                     if (coupon?.DiscountAmount != null) orderDiscountAmount = coupon?.DiscountAmount ?? 0;
                     if (coupon?.DiscountPercent != null) orderDiscountAmount = total * (coupon?.DiscountPercent ?? 0) / 100;
-                    if (coupon.MaxDiscountAmount != null && orderDiscountAmount > coupon.MaxDiscountAmount)
+                    if (coupon?.MaxDiscountAmount != null && orderDiscountAmount > coupon.MaxDiscountAmount)
                     {
                         orderDiscountAmount = coupon.MaxDiscountAmount ?? 0;
                     }
@@ -106,10 +129,11 @@ namespace EShop.Services.OrderServices
                 ShippingAddress = formData.ShippingAddress,
                 MobilePhone = formData.MobilePhone,
                 UserId = formData.UserId,
+                ReceiverName = formData.ReceiverName, 
                 OrderDate = DateTime.Now,
                 DiscountAmount = orderDiscountAmount,
                 PaymentMethod = formData.PaymentMethod,
-
+                CouponId = formData.CouponId,
 
             };
 
@@ -128,7 +152,7 @@ namespace EShop.Services.OrderServices
         public OrderViewModel GetOrderById(int id)
         {
             var order = this._context.Orders.Where(o => o.Id == id).Include(o=>o.User).FirstOrDefault();
-            var orderItemList = this._context.OrderItems.Where(oi => oi.OrderId == id).ToList();
+            var orderItemList = this._context.OrderItems.Where(oi => oi.OrderId == id).Include(oi=>oi.ProductOption).ThenInclude(o=>o.Product).ToList();
             foreach (var i in orderItemList)
             {
                 i.Order = null;
@@ -143,11 +167,11 @@ namespace EShop.Services.OrderServices
                 Status = order.Status,
                 TotalPrice = order.TotalPrice,
                 DiscountAmount = order.DiscountAmount,
-                OrderItems = orderItemList,
+                OrderItems = orderItemList.Select(oi => new OrderItemViewModel { OrderId = oi.OrderId, OptionId = oi.OptionId, Name= oi.ProductOption.Name, ProductName = oi.ProductOption.Product.Name, ProductImageUrl = oi.ProductOption.Product.ImageUrl, ProductId = oi.ProductOption.ProductId, Quantity = oi.Quantity, DiscountAmount = oi.DiscountAmount, UnitPrice= oi.UnitPrice }).ToList(),
                 IsPayed = order.IsPayed,
-                UserInfo = new DTOs.Account.UserViewModel() { Id = order.UserId, FullName=order.User.FullName,AvatarUrl = order.User.AvatarUrl, Email = order.User.Email }
-
-
+                UserInfo = new DTOs.Account.UserViewModel() { Id = order.UserId, FullName=order.User.FullName,AvatarUrl = order.User.AvatarUrl, Email = order.User.Email }, 
+                ReceiverName = order.ReceiverName,
+                CouponId = order.CouponId
             };
 
             return model;

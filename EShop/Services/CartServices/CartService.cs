@@ -59,7 +59,7 @@ namespace EShop.Services.CartServices
                 opt.Quantity = cartProductOptions.Where(cpo => cpo.OptionId == o.Id).FirstOrDefault().Quantity;
                 opt.ProductId = o.ProductId; 
                 opt.ProductName = o.Product.Name;
-                opt.ProductImageUrl = o.Product.ImageUrl; 
+                opt.ProductImageUrl = o.Product.ImageUrl;
 
                 if (o.Product.CurrentCoupon != null)
                 {
@@ -72,6 +72,8 @@ namespace EShop.Services.CartServices
                         opt.CurrentPrice = opt.Price * (1 - o.Product.CurrentCoupon.DiscountPercent / 100);
                     }
                 }
+                else opt.CurrentPrice = opt.Price; 
+
 
                 return opt;
             }).ToList();
@@ -98,6 +100,20 @@ namespace EShop.Services.CartServices
             model.OptionIds = user.CartProductOptions.Select(o => o.OptionId).ToList();
             model.Quantity = user.CartProductOptions.Select(p => p.Quantity).Sum();
             return model;
+        }
+
+        public async Task<UpdateCartViewModel> ChangeCartItemQuantity(int userId, int quantity, int optionId)
+        {
+            var cartItem = _context.Carts.Where(c => c.UserId == userId && c.OptionId == optionId).FirstOrDefault();
+            UpdateCartViewModel model = new UpdateCartViewModel();
+            model.UserId = userId;
+            model.Quantity = quantity;
+            model.OptionId = optionId;
+            cartItem.Quantity = quantity;
+            _context.Update(cartItem);
+            await this._context.SaveChangesAsync();
+            return model; 
+
         }
     }
 }

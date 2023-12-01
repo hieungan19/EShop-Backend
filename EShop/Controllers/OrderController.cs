@@ -51,5 +51,13 @@ namespace EShop.Controllers
            
             return Ok();
         }
+
+        [HttpGet("user/{userId}")]
+        public async Task<List<OrderViewModel>> GetAllOrdersByUserId( int userId)
+        {
+            
+            return await this._orderService.GetAllOrdersByUserId(userId);
+
+        }
     }
 }

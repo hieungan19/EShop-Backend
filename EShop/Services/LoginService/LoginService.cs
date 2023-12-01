@@ -81,6 +81,9 @@ namespace EShop.Services.LoginService
             string token = new JwtSecurityTokenHandler().WriteToken(await this.GenerateToken(user));
             userView.Email = user.Email;
             userView.FullName = user.FullName;
+            userView.Address = user.Address;
+            userView.PhoneNumber = user.PhoneNumber;
+            userView.AvatarUrl = user.AvatarUrl; 
             ApiRole role = await this._roleService.GetRoleByUserId(user.Id);
 
             userView.RoleName = role.Name;

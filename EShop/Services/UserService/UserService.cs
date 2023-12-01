@@ -26,34 +26,36 @@ namespace EShop.Services.UserService
             model.RoleName = this._roleService.GetUserRole(id);
             model.PhoneNumber = user.PhoneNumber;
             model.Address = user.Address;
-            model.AvatarUrl = user.AvatarUrl; 
+            model.AvatarUrl = user.AvatarUrl;
             return model;
         }
 
-        public async Task<UserListViewModel> GetUsers(int roleId )
+        public async Task<UserListViewModel> GetUsers(int roleId)
         {
             var users = await this._context.Users.ToListAsync();
             var model = new UserListViewModel();
 
-            model.Users = users.Select(u => new UserViewModel
-            {
-                Id = u.Id,
-                Email = u.Email,
-                FullName = u.FullName,
-                RoleName = this._roleService.GetUserRole(u.Id),
-                IsInRole = this._roleService.IsUserInRole(u.Id, roleId), 
-                PhoneNumber = u.PhoneNumber,
-                Address = u.Address,
-                AvatarUrl = u.AvatarUrl,
-
-            }).ToList();
+            model.Users = users
+     .Select(u => new UserViewModel
+     {
+         Id = u.Id,
+         Email = u.Email,
+         FullName = u.FullName,
+         RoleName = this._roleService.GetUserRole(u.Id),
+         IsInRole = this._roleService.IsUserInRole(u.Id, roleId),
+         PhoneNumber = u.PhoneNumber,
+         Address = u.Address,
+         AvatarUrl = u.AvatarUrl,
+     })
+     .Where(uvm => this._roleService.GetUserRole(uvm.Id) == "User")
+     .ToList();
 
             return model;
         }
 
-        public async Task<bool> Update(EditUserViewModel formData)
+        public async Task<bool> Update(int id, EditUserViewModel formData)
         {
-            var user = this._context.Users.Where(u => u.Id == formData.Id).FirstOrDefault();
+            var user = this._context.Users.Where(u => u.Id == id).FirstOrDefault();
 
             if (user == null)
             {
@@ -64,21 +66,24 @@ namespace EShop.Services.UserService
             {
                 user.Email = formData.Email;
             }
-            if (formData.FullName != null)
+            if (formData.FullName != null && formData.FullName != "" )
             {
                 user.FullName = formData.FullName;
             }
 
-            if (formData.Address != null)
+            if (formData.Address != null && formData.Address != "" )
             {
                 user.Address = formData.Address;
             }
-            if (formData.AvatarUrl != null)
+            if (formData.AvatarUrl != null && formData.AvatarUrl!="")
             {
                 user.AvatarUrl = formData.AvatarUrl;
             }
-
-            if (formData.OldPassword != "" && formData.NewPassword != "")
+            if (formData.PhoneNumber != null && formData.PhoneNumber!="")
+            {
+                user.PhoneNumber = formData.PhoneNumber;
+            }
+            if (formData.OldPassword !=null && formData.NewPassword!=null )
             {
                 PasswordHasher hash = new PasswordHasher();
                 var verifyOldPassword = hash.VerifyHashedPassword(user.PasswordHash, formData.OldPassword);

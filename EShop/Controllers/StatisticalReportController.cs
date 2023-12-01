@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using EShop.DTOs.ProductDTOs;
+using EShop.DTOs.StatisticalReportDTOs;
+using EShop.Services.StatisticalReport;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EShop.Controllers
@@ -7,5 +10,41 @@ namespace EShop.Controllers
     [ApiController]
     public class StatisticalReportController : ControllerBase
     {
+        private readonly IStatisticalReport _statisticalService;
+
+        public StatisticalReportController(IStatisticalReport statisticalService)
+        {
+            this._statisticalService = statisticalService;
+        }
+
+        [HttpGet("customer")]
+        public CustomerReport  GetCustomerReport()
+        {
+            return _statisticalService.CalculateNumberOfCustomersByLevel();
+        }
+
+        [HttpGet("order")]
+        public OrderReport GetOrderReport()
+        {
+            return _statisticalService.CalculateOrderStatistics(); 
+        }
+
+        [HttpGet("category")]
+        public Dictionary<string, int> GetProductsByCategories()
+        {
+            return  _statisticalService.CountProductsByCategory(); 
+        }
+
+        [HttpGet("product-review")]
+        public ProductListViewModel SortProductsByAverageReview()
+        {
+            return _statisticalService.SortProductsByAverageReview();
+        }
+
+        [HttpGet("product-sold")]
+        public ProductListViewModel SortProductsByQuantitySold()
+        {
+            return _statisticalService.SortProductsByQuantitySold();
+        }
     }
 }

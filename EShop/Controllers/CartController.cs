@@ -22,11 +22,11 @@ namespace EShop.Controllers
         [HttpPost]
         public async Task<LayoutCartViewModel> AddToCart(UpdateCartViewModel model)
         {
-            return await this._cartService.AddToCart(model.UserId, model.OptionId, model.Quantity);
+            return await this._cartService.AddToCart(model.UserId, model.OptionId, model.Quantity??1);
         }
 
         [HttpDelete]
-        public async Task<LayoutCartViewModel> RemoveFromCart([FromQuery] UpdateCardViewModel model)
+        public async Task<LayoutCartViewModel> RemoveFromCart([FromBody] UpdateCartViewModel model)
         {
             return await this._cartService.RemoveFromCart(model.UserId, model.OptionId);
         }
@@ -35,6 +35,10 @@ namespace EShop.Controllers
         public async Task<CartViewModel> GetUserCart(int id)
         {
             return await this._cartService.GetUserCart(id);
+        }
+        [HttpPut]
+        public async Task<UpdateCartViewModel> PutUserCart([FromBody] UpdateCartViewModel model) {
+            return await this._cartService.ChangeCartItemQuantity(model.UserId,  model.Quantity??1, model.OptionId);
         }
     }
 }

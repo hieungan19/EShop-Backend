@@ -13,6 +13,7 @@ using EShop.Services.ProductService;
 using EShop.Services.RegisterService;
 using EShop.Services.ReviewServices;
 using EShop.Services.RoleService;
+using EShop.Services.StatisticalReport;
 using EShop.Services.TestService;
 using EShop.Services.UserService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -75,6 +76,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
 builder.Services.AddScoped<IMomoService, MomoService>();
+builder.Services.AddScoped<IStatisticalReport,StatisticalReport >();
 
 var app = builder.Build();
 

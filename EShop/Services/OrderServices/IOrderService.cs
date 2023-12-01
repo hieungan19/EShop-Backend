@@ -9,5 +9,6 @@ namespace EShop.Services.OrderServices
         Task UpdateOrderStatus(int orderId, OrderStatus status);
         OrderViewModel GetOrderById(int id);
         Task<List<OrderViewModel>> GetAllOrders();
+        Task<List<OrderViewModel>> GetAllOrdersByUserId(int userId);
     }
 }

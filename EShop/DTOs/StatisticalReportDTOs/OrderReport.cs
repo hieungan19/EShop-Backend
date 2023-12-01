@@ -1,10 +1,12 @@
-﻿namespace EShop.DTOs.StatisticalReportDTOs
+﻿using EShop.Models.OrderModel;
+
+namespace EShop.DTOs.StatisticalReportDTOs
 {
     public class OrderReport
     {
-        //tổng số đơn
-        //status
-        //doanh thu
-        
+        public int Quantity { get; set; }
+        public double Revenue { get; set; }
+        public Dictionary<OrderStatus, int> StatusCounts { get; set; } = new Dictionary<OrderStatus, int>(); 
+
     }
 }
