@@ -17,7 +17,7 @@ namespace EShop.Controllers
             this._productService = productService;
         }
         [HttpGet]
-        public ProductListViewModel GetPaginatedProducts([FromQuery] FilterViewModel filters)
+        public Task< ProductListViewModel> GetPaginatedProducts([FromQuery] FilterViewModel filters)
         {
             return this._productService.GetPaginatedProducts(filters);
         }

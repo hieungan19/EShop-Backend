@@ -12,7 +12,7 @@ namespace EShop.Services.ProductService
         ProductViewModel GetProductById(int id);
         double GetTotalPages(int categoryId = 0, double priceFrom = 0, double priceTo = 0, int perPage = 0);
         IQueryable<Product> FilterQuery(IQueryable<Product> query, FilterViewModel filters);
-        ProductListViewModel GetPaginatedProducts(FilterViewModel filters);
+        Task<ProductListViewModel> GetPaginatedProducts(FilterViewModel filters);
 
         
 

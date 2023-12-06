@@ -7,7 +7,7 @@ namespace EShop.Controllers
 {
     public class CurrentStatus
     {
-        public string Status { get; set; }
+        public OrderStatus Status { get; set; }
     }
 
     [Route("api/orders")]
@@ -44,10 +44,9 @@ namespace EShop.Controllers
         public async Task<IActionResult> UpdateOrder(int id, [FromBody] CurrentStatus OrderStatus)
         {
         
-            if (Enum.TryParse<OrderStatus>(OrderStatus.Status, out OrderStatus orderStatus))
-            {
-                await this._orderService.UpdateOrderStatus(id, orderStatus);
-            }
+           
+                await this._orderService.UpdateOrderStatus(id, OrderStatus.Status);
+
            
             return Ok();
         }

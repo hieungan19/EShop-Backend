@@ -214,6 +214,7 @@ namespace EShop.Services.ProductService
                     Quantity = o.Quantity,
                 });
 
+                // Tạo option mới
                 foreach (var opt in formData.Options)
                 {
                     if (opt.Id == null)
@@ -304,10 +305,25 @@ namespace EShop.Services.ProductService
             return query;
         }
 
-        public ProductListViewModel GetPaginatedProducts(FilterViewModel filters)
+        public async Task<ProductListViewModel> GetPaginatedProducts(FilterViewModel filters)
         {
             int page = filters.CurrentPage != 0 ? filters.CurrentPage : 1;
-            var query = _context.Products.Include(p=>p.CurrentCoupon).Include(p=>p.Category).Include(p=>p.Reviews).AsQueryable();
+            var query = _context.Products.Include(p => p.CurrentCoupon).Include(p => p.Category).Include(p => p.Reviews).AsQueryable();
+            DateTime currentDate = DateTime.Now;
+
+            foreach (var product in query)
+            {
+                var currentCoupon = product.CurrentCoupon;
+
+                if (currentCoupon != null && currentDate > currentCoupon.EndDate)
+                {
+                    // Coupon đã hết hạn, cập nhật CurrentCouponId = null
+                    product.CurrentCouponId = null;
+                }
+            }
+
+            await _context.SaveChangesAsync(); // Await the SaveChangesAsync method
+
             if (filters.PerPage == 0) filters.PerPage = query.Count();
             query = FilterQuery(query, filters);
 
@@ -326,8 +342,8 @@ namespace EShop.Services.ProductService
                         ImageUrl = p.ImageUrl,
                         Category = p.Category,
                         QuantitySold = p.QuantitySold,
-                        AverageStar = p.Reviews.Any() ? p.Reviews.Average(r => r.Star):0
-                }).ToList();
+                        AverageStar = p.Reviews.Any() ? p.Reviews.Average(r => r.Star) : 0
+                    }).ToList();
 
             var model = new ProductListViewModel();
             model.Products = products;
@@ -335,6 +351,7 @@ namespace EShop.Services.ProductService
 
             return model;
         }
+
 
         public async Task UpdatCurrentDiscount(int productId, int? newCurrentCoupon)
         {

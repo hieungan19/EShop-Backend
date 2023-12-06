@@ -88,7 +88,10 @@ namespace EShop.Services.CartServices
 
         public async Task<LayoutCartViewModel> RemoveFromCart(int userId, int optionId)
         {
+            Console.WriteLine(userId);
+            Console.WriteLine(optionId);
             var user = this._context.Users.Where(u => u.Id == userId).Include(u => u.CartProductOptions).ThenInclude(c => c.Option).FirstOrDefault();
+            
 
             var cartProductOption = this._context.Carts.Where(c => c.UserId == userId && c.OptionId == optionId).FirstOrDefault();
             this._context.Carts.Remove(cartProductOption);

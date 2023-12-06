@@ -83,7 +83,8 @@ namespace EShop.Services.LoginService
             userView.FullName = user.FullName;
             userView.Address = user.Address;
             userView.PhoneNumber = user.PhoneNumber;
-            userView.AvatarUrl = user.AvatarUrl; 
+            userView.AvatarUrl = user.AvatarUrl;
+            userView.Id = user.Id; 
             ApiRole role = await this._roleService.GetRoleByUserId(user.Id);
 
             userView.RoleName = role.Name;

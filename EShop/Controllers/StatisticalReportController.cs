@@ -46,5 +46,13 @@ namespace EShop.Controllers
         {
             return _statisticalService.SortProductsByQuantitySold();
         }
+
+        [HttpGet("monthly-statistics")]
+        public async Task<IActionResult> GetMonthlyStatistics()
+        {
+            // Assuming you want data for the year 2023
+            var monthlyStatistics = await _statisticalService.GetMonthlyStatisticsAsync(2023);
+            return Ok(monthlyStatistics);
+        }
     }
 }

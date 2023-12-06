@@ -17,7 +17,10 @@ namespace EShop.Services.StatisticalReport
         // Sắp xếp các sản phẩm bán chạy 
        ProductListViewModel SortProductsByQuantitySold();
         // Sắp xếp các sản phẩm có lượt review cao
-        ProductListViewModel SortProductsByAverageReview(); 
+        ProductListViewModel SortProductsByAverageReview();
+        Task<List<MonthlyStatistic>> GetMonthlyStatisticsAsync(int year);
+
+
 
 
     }

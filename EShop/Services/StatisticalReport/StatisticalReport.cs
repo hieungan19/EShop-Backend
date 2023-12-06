@@ -3,6 +3,8 @@ using EShop.DTOs.ProductDTOs;
 using EShop.DTOs.StatisticalReportDTOs;
 using EShop.Models.Account;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+
 
 namespace EShop.Services.StatisticalReport
 {
@@ -17,6 +19,29 @@ namespace EShop.Services.StatisticalReport
             this._context = context;
 
         }
+        public async Task<List<MonthlyStatistic>> GetMonthlyStatisticsAsync(int year)
+        {
+            var allMonths = Enumerable.Range(1, 12); // Generate a sequence of all months (1 to 12)
+
+            var monthlyStatistics = (
+                from month in allMonths
+                join order in _context.Orders
+                    .Where(o => o.IsPayed && o.OrderDate != null && o.OrderDate.Year == year)
+                    on month equals order.OrderDate.Month into g
+                from orderGroup in g.DefaultIfEmpty() // Left join
+                group orderGroup by month into grouped
+                select new MonthlyStatistic
+                {
+                    Month = grouped.Key,
+                    NumberOfOrders = grouped.Count(o => o != null), // Count non-null orders
+                    TotalRevenue = grouped.Sum(o => (o?.TotalPrice - o?.DiscountAmount) ?? 0) // Sum revenue, handle nulls
+                }
+            )
+            .OrderBy(m => m.Month).ToList();
+
+            return monthlyStatistics;
+        }
+
         public CustomerReport CalculateNumberOfCustomersByLevel()
         {
             CustomerReport customerReport = new CustomerReport();
@@ -26,16 +51,18 @@ namespace EShop.Services.StatisticalReport
             foreach (var user in users)
             {
 
-                var totalAmountPurchased =  orders.Where(order => order.UserId == user.Id)
-            .Sum(order => order.TotalPrice);
+                var totalAmountPurchased = orders.Where(order => order.UserId == user.Id)
+            .Sum(order => (order.TotalPrice- order.DiscountAmount));
+                Console.WriteLine(totalAmountPurchased); 
                 switch (totalAmountPurchased)
                 {
-                    case var amount when amount < 1000000:
-                        customerReport.Level0++; 
+                    case var amount when amount <= 0:
+                        customerReport.Level0++;
                         break;
-                    case var amount when amount >= 0:
+                    case var amount when amount < 1000000:
                         customerReport.Level1k++;
                         break;
+                  
                     case var amount when amount >= 1000000 && amount < 5000000:
                         customerReport.Level5k++;
                         break;
@@ -52,7 +79,7 @@ namespace EShop.Services.StatisticalReport
 
             }
 
-            return customerReport; 
+            return customerReport;
 
 
 
@@ -69,7 +96,7 @@ namespace EShop.Services.StatisticalReport
             foreach (var order in orders)
             {
                 // Tăng biến đếm số lượng đơn hàng
-                orderReport.Quantity++; 
+                orderReport.Quantity++;
 
                 // Tăng tổng doanh thu
                 orderReport.Revenue += order.TotalPrice;
@@ -88,19 +115,19 @@ namespace EShop.Services.StatisticalReport
             }
 
             // Tạo và trả về đối tượng kết quả
-            return orderReport; 
+            return orderReport;
         }
 
         public Dictionary<string, int> CountProductsByCategory()
         {
             Dictionary<string, int> countByCategory = new Dictionary<string, int>();
-            var products = _context.Products.Include(p=>p.Category).ToList();
-            
+            var products = _context.Products.Include(p => p.Category).ToList();
+
             // Duyệt qua danh sách sản phẩm
             foreach (var product in products)
             {
                 // Kiểm tra xem phân loại đã có trong từ điển chưa
-               
+
                 if (countByCategory.ContainsKey(product.Category.Name))
                 {
                     // Nếu đã có, tăng giá trị tương ứng
@@ -119,17 +146,17 @@ namespace EShop.Services.StatisticalReport
 
         public ProductListViewModel SortProductsByAverageReview()
         {
-            var model = new ProductListViewModel(); 
+            var model = new ProductListViewModel();
             model.Products = _context.Products.AsQueryable().Select(p =>
                     new ProductViewModel()
                     {
                         Id = p.Id,
                         Name = p.Name,
-                        
+
                         AverageStar = p.Reviews.Any() ? p.Reviews.Average(r => r.Star) : 0
                     }).ToList();
             model.Products = model.Products.OrderByDescending(product => product.AverageStar).ToList();
-            return model; 
+            return model;
 
         }
 
@@ -141,7 +168,7 @@ namespace EShop.Services.StatisticalReport
                     {
                         Id = p.Id,
                         Name = p.Name,
-
+                        QuantitySold = p.QuantitySold,
                         AverageStar = p.Reviews.Any() ? p.Reviews.Average(r => r.Star) : 0
                     }).ToList();
             model.Products = model.Products.OrderByDescending(product => product.QuantitySold).ToList();
@@ -149,8 +176,8 @@ namespace EShop.Services.StatisticalReport
         }
     }
 
-    
 
-        
-    }
+
+
+}
 
