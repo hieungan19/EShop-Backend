@@ -1,0 +1,123 @@
+﻿using EShop.Data;
+using EShop.DTOs.Account;
+using EShop.Models.Account;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
+namespace EShop.Services.RoleService
+{
+    public class RoleService:IRoleService
+    {
+        private readonly EShopDBContext _context;
+        public RoleService(EShopDBContext context)
+        {
+            this._context = context;
+        }
+
+        public async Task<List<ApiRole>> GetAllRoles()
+        {
+            return await this._context.Roles.ToListAsync();
+        }
+
+        public async Task<ApiRole?> GetRoleByName(string roleName)
+        {
+            return await this._context.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+        }
+
+        public async Task<ApiRole> GetRoleByUserId(int userId)
+        {
+            var userRoleId = this._context.UserRoles
+                .Where(ur => ur.UserId == userId)
+                .Select(ur => ur.RoleId)
+                .First();
+
+            return await this._context.Roles.Where(r => r.Id == userRoleId).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<IdentityUserRole<int>>> GetUserRoles(int userId)
+        {
+            return await this._context.UserRoles.Where(ur => ur.UserId == userId).ToListAsync();
+        }
+
+        public string GetUserRole(int userId)
+        {
+            var userRole = this._context.UserRoles.Where(ur => ur.UserId == userId).FirstOrDefault();
+            if (userRole == null)
+            {
+                throw new Exception();
+            }
+
+            var role = this._context.Roles.Where(r => r.Id == userRole.RoleId).FirstOrDefault();
+            if (role == null)
+            {
+                throw new Exception();
+            }
+
+            return role.Name;
+        }
+
+        public async Task<RoleViewModel> GetRoleById(int roleId)
+        {
+            var role = await this._context.Roles.Where(r => r.Id == roleId).FirstOrDefaultAsync();
+            var userRoles = await this._context.UserRoles.Where(ur => ur.RoleId == roleId).ToListAsync();
+            var usersInRole = new List<UserViewModel>();
+
+            foreach (var userRole in userRoles)
+            {
+                var user = this._context.Users.Where(u => u.Id == userRole.UserId).FirstOrDefault();
+
+                usersInRole.Add(new UserViewModel() { Id = user.Id, FullName = user.FullName,  Email = user.Email });
+            }
+
+            var model = new RoleViewModel()
+            {
+                Id = roleId,
+                Name = role.Name,
+                Users = usersInRole
+            };
+
+            return model;
+        }
+
+        public async Task<List<RoleViewModel>> GetListOfRoles()
+        {
+            return await this._context.Roles.Select(r => new RoleViewModel() { Id = r.Id, Name = r.Name }).ToListAsync();
+        }
+
+        public bool IsUserInRole(int userId, int roleId)
+        {
+            var userRole = this._context.UserRoles.Where(ur => ur.UserId == userId && ur.RoleId == roleId).FirstOrDefault();
+
+            if (userRole != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void UpdateUsersInRole(RoleViewModel formData)
+        {
+            var userRoles = this._context.UserRoles.Where(ur => ur.RoleId == formData.Id).ToList();
+
+            var newUserRoles = new List<IdentityUserRole<int>>();
+
+            foreach (var user in formData.Users)
+            {
+                var userRole = new IdentityUserRole<int>()
+                {
+                    UserId = user.Id,
+                    RoleId = formData.Id,
+                };
+
+                newUserRoles.Add(userRole);
+            }
+
+            this._context.UserRoles.RemoveRange(userRoles);
+            this._context.UserRoles.AddRange(newUserRoles);
+            this._context.SaveChanges();
+        }
+    }
+}

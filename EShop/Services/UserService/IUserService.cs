@@ -1,6 +1,13 @@
-﻿namespace EShop.Services.UserService
+﻿using EShop.DTOs.Account;
+
+namespace EShop.Services.UserService
 {
     public interface IUserService
     {
+        Task<UserViewModel> GetUserById(int id);
+        Task<UserListViewModel> GetUsers(int roleId );
+
+        Task<bool> Update(int id, EditUserViewModel userViewModel);
+
     }
 }
