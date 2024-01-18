@@ -4,6 +4,7 @@ using EShop.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EShop.Migrations
 {
     [DbContext(typeof(EShopDBContext))]
-    partial class EShopDBContextModelSnapshot : ModelSnapshot
+    [Migration("20231226040644_product1")]
+    partial class product1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,14 +58,14 @@ namespace EShop.Migrations
                         new
                         {
                             Id = 1,
-                            ConcurrencyStamp = "0bcb01b0-83be-410a-9aba-4745738cce19",
+                            ConcurrencyStamp = "4561605a-d31e-4f8b-a3ec-85ef093640b7",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            ConcurrencyStamp = "ead5b619-52e7-4531-8db7-b4b22be47dbf",
+                            ConcurrencyStamp = "a38abd58-74ea-4729-ad52-7bffd9820e71",
                             Name = "User",
                             NormalizedName = "USER"
                         });

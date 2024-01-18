@@ -25,9 +25,11 @@ namespace EShop.Services.MomoServices
         {
             Order model =  _context.Orders.Where(o => o.Id == id).Include(o=>o.User).FirstOrDefault();
             string orderPaymentInfo = "Khách hàng: " + model.User.FullName + ". Nội dung: Thanh toán tại Lamut";
-            model.Id += 123456; 
+            model.Id += 123456;
+            var total = model.DiscountAmount>0 ? model.TotalPrice - model.DiscountAmount : model.TotalPrice;
+            Console.WriteLine(total); 
             var rawData =
-                $"partnerCode={_options.Value.PartnerCode}&accessKey={_options.Value.AccessKey}&requestId={model.Id}&amount={model.TotalPrice}&orderId={model.Id}&orderInfo={orderPaymentInfo}&returnUrl={_options.Value.ReturnUrl}&notifyUrl={_options.Value.NotifyUrl}&extraData=";
+                $"partnerCode={_options.Value.PartnerCode}&accessKey={_options.Value.AccessKey}&requestId={model.Id}&amount={total}&orderId={model.Id}&orderInfo={orderPaymentInfo}&returnUrl={_options.Value.ReturnUrl}&notifyUrl={_options.Value.NotifyUrl}&extraData=";
             Console.WriteLine(rawData); 
             var signature = ComputeHmacSha256(rawData, _options.Value.SecretKey);
 
@@ -44,7 +46,7 @@ namespace EShop.Services.MomoServices
                 notifyUrl = _options.Value.NotifyUrl,
                 returnUrl = _options.Value.ReturnUrl,
                 orderId = model.Id.ToString(),
-                amount = model.TotalPrice.ToString(),
+                amount = (model.TotalPrice - model.DiscountAmount).ToString(),
                 orderInfo = orderPaymentInfo,
                 requestId = model.Id.ToString(),
                 extraData = "",

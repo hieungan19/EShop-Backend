@@ -186,7 +186,7 @@ namespace EShop.Services.OrderServices
             {
                 order.Status = status;
                 this._context.Update(order);
-
+                Console.WriteLine(order.Status); 
                 if (order.Status == OrderStatus.Shipped)
                 {
                     foreach (var item in items)
@@ -196,6 +196,8 @@ namespace EShop.Services.OrderServices
                         var product = _context.Products.Where(p => p.Id == opt.ProductId).FirstOrDefault();
                         product.QuantitySold = product.QuantitySold + item.Quantity;
                         int quantity = opt.Quantity - item.Quantity;
+                        Console.WriteLine(opt.Name); 
+                        Console.WriteLine(quantity); 
                         this._optionService.Update(new OptionViewModel() { Id = item.OptionId, Name = opt.Name, ProductId = opt.ProductId, Quantity = quantity });
 
                     }
